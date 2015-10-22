@@ -4,34 +4,22 @@
  * and open the template in the editor.
  */
 package gui;
-import generic.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
-import javax.swing.JTextArea;
 
 /**
  *
  * @author truol014
  */
 public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
-    private RoverSocket roverSocket;
     private final int port = 9897;
-    public ChemCamAgentPanel() throws UnknownHostException{
+    public Socket AgentSocket;
+    public ChemCamAgentPanel(){
         initComponents();
-	setRoverSocket(port, null);
-    }
-    private void setRoverSocket(int port, InetAddress host) throws UnknownHostException{		
-	this.roverSocket = new RoverSocket(port, host);
-    }
-    public RoverSocket getRoverSocket(){		
-	return roverSocket;
-    }
-    public void closeChemCamAgentSocket() throws IOException{
-	if(roverSocket != null)
-            roverSocket.closeAll();
     }
     /**
      * Creates new form ChemCamAgentPanel
@@ -40,36 +28,33 @@ public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
     @Override
     public void run(){
     // TODO Auto-generated method stub
-        JTextArea TextArea = this.jTextArea1;
-        try{
-            ObjectInputStream ois = null;
-            ObjectOutputStream oos = null;
+        try{            
             Thread.sleep(2000);
-            for(int i=0; i<5;i++){
+            for(int i = 0; i < 5; i++){
+                AgentSocket = new Socket(InetAddress.getLocalHost(), port);
                 //establish socket connection to server
                 //socket = new Socket(host.getHostName(), 9876);
-                //write to socket using ObjectOutputStream
-                oos = new ObjectOutputStream(getRoverSocket().getNewSocket().getOutputStream());
-                TextArea.append("Client: Sending request to Socket Server\n");
-                if(i==4)oos.writeObject("exit");
-                else oos.writeObject("Test "+i);
-                //read the server response message
-                ois = new ObjectInputStream(getRoverSocket().getSocket().getInputStream());
+                //write to socket using ObjectOutputStream                
+                ObjectOutputStream oos = new ObjectOutputStream(AgentSocket.getOutputStream());
+                jTextArea1.append("Client: Sending request to Socket Server\n");
+                if(i == 4)oos.writeObject("exit");
+                else oos.writeObject("Test " + i);
+                //read the server response message                
+                ObjectInputStream ois = new ObjectInputStream(AgentSocket.getInputStream());
                 String message = (String) ois.readObject();
-                TextArea.append("Client: Message from Server - " + message.toUpperCase() + "\n");
+                jTextArea1.append("Client: Message from Server - " + message.toUpperCase() + "\n");
                 //close resources
                 ois.close();
                 oos.close();
                 Thread.sleep(1000);
-            }
-            closeChemCamAgentSocket();
+                AgentSocket.close();
+            }            
         }
-        catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        catch (UnknownHostException uhe) {
+            System.out.println("UnknownHostException on socket connecting: " + uhe);
         }
-        catch (Exception error) {
-            TextArea.append("Client: Error:" + error.getMessage() + "\n");
+        catch (IOException | InterruptedException | ClassNotFoundException error) {
+            jTextArea1.append("Client: Error:" + error.getMessage() + "\n");
         }
     }
 

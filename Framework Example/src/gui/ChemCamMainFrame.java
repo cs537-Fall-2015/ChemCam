@@ -30,10 +30,11 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         try {
-            chemCamAgentPanel1 = new gui.ChemCamAgentPanel();
-        } catch (java.net.UnknownHostException e1) {
+            chemCamControllerPanel1 = new gui.ChemCamControllerPanel();
+        } catch (java.io.IOException e1) {
             e1.printStackTrace();
         }
+        chemCamAgentPanel1 = new gui.ChemCamAgentPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -41,12 +42,21 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(chemCamAgentPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chemCamControllerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(chemCamAgentPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(5, 5, 5)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(chemCamControllerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chemCamAgentPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -79,6 +89,9 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ChemCamMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -86,14 +99,12 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
             public void run() {
                 new ChemCamMainFrame().setVisible(true);		
 		try {
-                    //Thread server = RoverThreadHandler.getRoverThreadHandler().getNewThread(chemCamControllerPanel2);
-                    Thread client = RoverThreadHandler.getRoverThreadHandler().getNewThread(chemCamAgentPanel1);
-                    //server.start();
+                    Thread controller = new Thread(chemCamControllerPanel1);
+                    Thread client = new Thread(chemCamAgentPanel1);
+                    controller.start();
                     client.start();
                 } 
 		catch (Exception e) {
-                // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
             }
         });
@@ -101,5 +112,6 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static gui.ChemCamAgentPanel chemCamAgentPanel1;
+    private static gui.ChemCamControllerPanel chemCamControllerPanel1;
     // End of variables declaration//GEN-END:variables
 }

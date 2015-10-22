@@ -4,34 +4,24 @@
  * and open the template in the editor.
  */
 package gui;
-import generic.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import javax.swing.JTextArea;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author truol014
  */
 public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnable{
-    private RoverServerSocket roverServerSocket;
-    private final int port = 9898;
-    public ChemCamControllerPanel() throws IOException{
+    private final int port = 9897;
+    public ServerSocket ControllerServerSocket;
+    public Socket ControllerSocket;
+    public ChemCamControllerPanel() throws IOException{       
         initComponents();
-        setRoverServerSocket(port);
-    }
-    private void setRoverServerSocket(int port) throws IOException {
-        this.roverServerSocket = new RoverServerSocket(port);
-    }
-    public RoverServerSocket getRoverServerSocket() {
-        return roverServerSocket;
-    }
-    public void closeAll() throws IOException{
-        if(roverServerSocket != null)
-            roverServerSocket.closeAll();
     }
     /**
      * Creates new form ChemCamControllerPanel
@@ -39,20 +29,18 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
     
     @Override
     public void run() {
-        // TODO Auto-generated method stub
-        JTextArea TextArea = this.jTextArea1;
-        try {
-            while(true){
-                TextArea.append("Server: Waiting for client request\n");	            
-                //creating socket and waiting for client connection
-                getRoverServerSocket().openSocket();
+        try{
+            ControllerServerSocket = new ServerSocket(port); 
+            while(true){                                
+                ControllerSocket = ControllerServerSocket.accept();
+                jTextArea1.append("Server: Waiting for client request\n");                
                 //read from socket to ObjectInputStream object
-                ObjectInputStream ois = new ObjectInputStream(getRoverServerSocket().getSocket().getInputStream());
+                ObjectInputStream ois = new ObjectInputStream(ControllerSocket.getInputStream());
                 //convert ObjectInputStream object to String
                 String message = (String) ois.readObject();
-                TextArea.append("Server: Message Received from Client - " + message.toUpperCase() + "\n");
+                jTextArea1.append("Server: Message Received from Client - " + message.toUpperCase() + "\n");
                 //create ObjectOutputStream object
-                ObjectOutputStream oos = new ObjectOutputStream(getRoverServerSocket().getSocket().getOutputStream());
+                ObjectOutputStream oos = new ObjectOutputStream(ControllerSocket.getOutputStream());
                 //write object to Socket
                 oos.writeObject("Server says Hi Client - " + message);
                 //close resources
@@ -60,23 +48,18 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
                 oos.close();
                 //getRoverServerSocket().closeSocket();
                 //terminate the server if client sends exit request
-                if(message.equalsIgnoreCase("exit")) break;
+                if(message.equalsIgnoreCase("exit")) break;                
             }
-            TextArea.append("Server: Shutting down Socket server!!\n");
-            //close the ServerSocket object
-            closeAll();
-            }
-            catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-	    catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-	    }
-        catch(Exception error){
-            TextArea.append("Server: Error:" + error.getMessage() + "\n");
-        }		
+            jTextArea1.append("Server: Shutting down Socket server!!\n");
+            ControllerSocket.close();
+            //close the ServerSocket object            
+        } 
+        catch (IOException ioe) {
+            System.out.println("IOException on socket listen: " + ioe);
+        } 
+        catch (ClassNotFoundException ex) {
+            Logger.getLogger(ChemCamControllerPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } 	
     }
 
     /**
