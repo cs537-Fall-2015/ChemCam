@@ -10,6 +10,11 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+<<<<<<< HEAD
+=======
+import javax.swing.JTextArea;
+//comment
+>>>>>>> fef3325d7452936ff86340ad1b8a0cee6ff37fa6
 
 /**
  *
