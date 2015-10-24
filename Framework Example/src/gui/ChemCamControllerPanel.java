@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * @author truol014
  */
 public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnable{
-    private final int port = 9897;
+    private final int port = 9011;
     public ServerSocket ControllerServerSocket;
     public Socket ControllerSocket;
     public ChemCamControllerPanel() throws IOException{       
@@ -34,17 +34,21 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
             while(true){                                
                 ControllerSocket = ControllerServerSocket.accept();
                 jTextArea1.append("Server: Waiting for client request\n");                
-                //read from socket to ObjectInputStream object
-                ObjectInputStream ois = new ObjectInputStream(ControllerSocket.getInputStream());
+                String message;
+                ObjectOutputStream oos;
                 //convert ObjectInputStream object to String
-                String message = (String) ois.readObject();
-                jTextArea1.append("Server: Message Received from Client - " + message.toUpperCase() + "\n");
-                //create ObjectOutputStream object
-                ObjectOutputStream oos = new ObjectOutputStream(ControllerSocket.getOutputStream());
-                //write object to Socket
-                oos.writeObject("Server says Hi Client - " + message);
-                //close resources
-                ois.close();
+                //read from socket to ObjectInputStream object
+                try(ObjectInputStream ois = new ObjectInputStream(ControllerSocket.getInputStream())) {
+                    //convert ObjectInputStream object to String
+                    message = (String)ois.readObject();
+                    jTextArea1.append("Server: Message Received from Client - " + message.toUpperCase() + "\n");
+                    //create ObjectOutputStream object
+                    oos = new ObjectOutputStream(ControllerSocket.getOutputStream());
+                    //write object to Socket
+                    oos.writeObject("Server says Hi Client - " + message);
+                    //close resources
+                    ois.close();
+                }
                 oos.close();
                 //getRoverServerSocket().closeSocket();
                 //terminate the server if client sends exit request
@@ -74,7 +78,9 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
 
+        jTextArea1.setBackground(new java.awt.Color(0, 0, 0));
         jTextArea1.setColumns(20);
+        jTextArea1.setForeground(new java.awt.Color(51, 153, 0));
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
@@ -82,11 +88,11 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
         );
     }// </editor-fold>//GEN-END:initComponents
 
