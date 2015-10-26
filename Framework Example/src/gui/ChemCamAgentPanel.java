@@ -16,24 +16,28 @@ import java.util.logging.Logger;
  *
  * @author truol014
  */
-public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnable{
+public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
     private final int port = 9011;
     public ServerSocket ControllerServerSocket;
     public Socket ControllerSocket;
-    public ChemCamControllerPanel() throws IOException{       
+    public ChemCamAgentPanel() throws IOException{       
         initComponents();
     }
     /**
+     * Creates new form ChemCamControllerPanel    /**
      * Creates new form ChemCamControllerPanel
      */
     
+    /**
+     * Creates new form ChemCamAgentPanel
+     */
     @Override
     public void run() {
         try{
             ControllerServerSocket = new ServerSocket(port); 
             while(true){                                
                 ControllerSocket = ControllerServerSocket.accept();
-                jTextArea1.append("Server: Waiting for client request\n");                
+                jTextArea1.append("Agent: Waiting for command\n");                
                 String message;
                 ObjectOutputStream oos;
                 //convert ObjectInputStream object to String
@@ -41,11 +45,11 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
                 try(ObjectInputStream ois = new ObjectInputStream(ControllerSocket.getInputStream())) {
                     //convert ObjectInputStream object to String
                     message = (String)ois.readObject();
-                    jTextArea1.append("Server: Message Received from Client - " + message.toUpperCase() + "\n");
+                    jTextArea1.append("Agent: Command Received from Controller - " + message.toUpperCase() + "\n");
                     //create ObjectOutputStream object
                     oos = new ObjectOutputStream(ControllerSocket.getOutputStream());
                     //write object to Socket
-                    oos.writeObject("Server says Hi Client - " + message);
+                    oos.writeObject("Controller says Hi Agent - " + message);
                     //close resources
                     ois.close();
                 }
@@ -54,7 +58,7 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
                 //terminate the server if client sends exit request
                 if(message.equalsIgnoreCase("exit")) break;                
             }
-            jTextArea1.append("Server: Shutting down Socket server!!\n");
+            jTextArea1.append("Agent: Shutting down Socket Agent!!\n");
             ControllerSocket.close();
             //close the ServerSocket object            
         } 
@@ -62,7 +66,7 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
             System.out.println("IOException on socket listen: " + ioe);
         } 
         catch (ClassNotFoundException ex) {
-            Logger.getLogger(ChemCamControllerPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ChemCamAgentPanel.class.getName()).log(Level.SEVERE, null, ex);
         } 	
     }
 

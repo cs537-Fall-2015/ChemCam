@@ -33,9 +33,9 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        chemCamAgentPanel1 = new gui.ChemCamAgentPanel();
+        chemCamAgentPanel1 = new gui.ChemCamControllerPanel();
         try {
-            chemCamControllerPanel1 = new gui.ChemCamControllerPanel();
+            chemCamControllerPanel1 = new gui.ChemCamAgentPanel();
         } catch (java.io.IOException e1) {
             e1.printStackTrace();
         }
@@ -107,8 +107,8 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private static gui.ChemCamAgentPanel chemCamAgentPanel1;
-    private static gui.ChemCamControllerPanel chemCamControllerPanel1;
+    private static gui.ChemCamControllerPanel chemCamAgentPanel1;
+    private static gui.ChemCamAgentPanel chemCamControllerPanel1;
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 }

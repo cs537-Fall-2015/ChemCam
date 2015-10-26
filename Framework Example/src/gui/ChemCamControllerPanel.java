@@ -15,16 +15,22 @@ import java.net.UnknownHostException;
  *
  * @author truol014
  */
-public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
+public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnable{
     private final int port = 9011;
     public Socket AgentSocket;
-    public ChemCamAgentPanel(){
+    public ChemCamControllerPanel(){
         initComponents();
     }
     /**
+     * Creates new form ChemCamAgentPanel    /**
+     * Creates new form ChemCamAgentPanel    /**
+     * Creates new form ChemCamAgentPanel    /**
      * Creates new form ChemCamAgentPanel
      */
     
+    /**
+     * Creates new form ChemCamControllerPanel
+     */
     @Override
     public void run(){
     // TODO Auto-generated method stub
@@ -32,11 +38,11 @@ public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
             Thread.sleep(2000);
             for(int i = 0; i < 5; i++){
                 AgentSocket = new Socket(InetAddress.getLocalHost(), port);
-                //establish socket connection to server
+                //establish socket connection to server 
                 //socket = new Socket(host.getHostName(), 9876);
                 //write to socket using ObjectOutputStream
                 try(ObjectOutputStream oos = new ObjectOutputStream(AgentSocket.getOutputStream())){
-                    jTextArea1.append("Client: Sending request to Socket Server\n");
+                    jTextArea1.append("Controller: Sending command to Agent\n");
                     if(i == 4){
                         oos.writeObject("exit");
                     }
@@ -46,7 +52,7 @@ public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
                     //read the server response message
                     try(ObjectInputStream ois = new ObjectInputStream(AgentSocket.getInputStream())){
                         String message = (String) ois.readObject();
-                        jTextArea1.append("Client: Message from Server - " + message.toUpperCase() + "\n");
+                        jTextArea1.append("Controller: Message from Agent - " + message.toUpperCase() + "\n");
                         //close resources
                         ois.close();
                     }
@@ -57,10 +63,10 @@ public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
             }    
         }
         catch (UnknownHostException uhe) {
-            jTextArea1.append("UnknownHostException on socket connecting: " + uhe);
+            jTextArea1.append("Controller: UnknownHostException on socket connecting: " + uhe);
         }
         catch (IOException | InterruptedException | ClassNotFoundException error) {
-            jTextArea1.append("Client: Error:" + error.getMessage() + "\n");
+            jTextArea1.append("Controller: Error:" + error.getMessage() + "\n");
         }
     }
 
