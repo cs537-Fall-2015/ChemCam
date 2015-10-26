@@ -7,61 +7,63 @@ package gui;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author truol014
  */
-public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
+public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnable{
     private final int port = 9011;
-    public Socket AgentSocket;
-    public ChemCamAgentPanel(){
+    public ServerSocket ControllerServerSocket;
+    public Socket ControllerSocket;
+    public ChemCamControllerPanel() throws IOException{       
         initComponents();
     }
     /**
-     * Creates new form ChemCamAgentPanel
+     * Creates new form ChemCamControllerPanel
      */
     
     @Override
-    public void run(){
-    // TODO Auto-generated method stub
-        try{            
-            Thread.sleep(2000);
-            for(int i = 0; i < 5; i++){
-                AgentSocket = new Socket(InetAddress.getLocalHost(), port);
-                //establish socket connection to server
-                //socket = new Socket(host.getHostName(), 9876);
-                //write to socket using ObjectOutputStream
-                try(ObjectOutputStream oos = new ObjectOutputStream(AgentSocket.getOutputStream())){
-                    jTextArea1.append("Client: Sending request to Socket Server\n");
-                    if(i == 4){
-                        oos.writeObject("exit");
-                    }
-                    else{
-                        oos.writeObject("Test " + i);
-                    }
-                    //read the server response message
-                    try(ObjectInputStream ois = new ObjectInputStream(AgentSocket.getInputStream())){
-                        String message = (String) ois.readObject();
-                        jTextArea1.append("Client: Message from Server - " + message.toUpperCase() + "\n");
-                        //close resources
-                        ois.close();
-                    }
-                    oos.close();
+    public void run() {
+        try{
+            ControllerServerSocket = new ServerSocket(port); 
+            while(true){                                
+                ControllerSocket = ControllerServerSocket.accept();
+                jTextArea1.append("Server: Waiting for client request\n");                
+                String message;
+                ObjectOutputStream oos;
+                //convert ObjectInputStream object to String
+                //read from socket to ObjectInputStream object
+                try(ObjectInputStream ois = new ObjectInputStream(ControllerSocket.getInputStream())) {
+                    //convert ObjectInputStream object to String
+                    message = (String)ois.readObject();
+                    jTextArea1.append("Server: Message Received from Client - " + message.toUpperCase() + "\n");
+                    //create ObjectOutputStream object
+                    oos = new ObjectOutputStream(ControllerSocket.getOutputStream());
+                    //write object to Socket
+                    oos.writeObject("Server says Hi Client - " + message);
+                    //close resources
+                    ois.close();
                 }
-                Thread.sleep(1000);
-                AgentSocket.close();
-            }    
-        }
-        catch (UnknownHostException uhe) {
-            jTextArea1.append("UnknownHostException on socket connecting: " + uhe);
-        }
-        catch (IOException | InterruptedException | ClassNotFoundException error) {
-            jTextArea1.append("Client: Error:" + error.getMessage() + "\n");
-        }
+                oos.close();
+                //getRoverServerSocket().closeSocket();
+                //terminate the server if client sends exit request
+                if(message.equalsIgnoreCase("exit")) break;                
+            }
+            jTextArea1.append("Server: Shutting down Socket server!!\n");
+            ControllerSocket.close();
+            //close the ServerSocket object            
+        } 
+        catch (IOException ioe) {
+            System.out.println("IOException on socket listen: " + ioe);
+        } 
+        catch (ClassNotFoundException ex) {
+            Logger.getLogger(ChemCamControllerPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } 	
     }
 
     /**
@@ -73,81 +75,8 @@ public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jSplitPane1 = new javax.swing.JSplitPane();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select A Command", "CCAM_COOLER_ON", "CCAM_COOLER_OFF", "CCAM_POWER_ON", "CCAM_POWER_OFF", "CCAM_SET_FOCUS", "CCAM_LASER_ON", "CCAM_LASER_OFF", "CCAM_CWL_WARM", "CCAM_LIBS_WARM", "CCAM_FIRE_LASER" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
-
-        jButton1.setText("Clear");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        jButton2.setText("Send");
-
-        jCheckBox1.setText("High Priority");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jCheckBox1))
-                .addGap(2, 2, 2))
-        );
-
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane3.setViewportView(jTextArea2);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane3)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3))
-        );
-
-        jSplitPane1.setLeftComponent(jPanel1);
 
         jTextArea1.setBackground(new java.awt.Color(0, 0, 0));
         jTextArea1.setColumns(20);
@@ -155,43 +84,21 @@ public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        jSplitPane1.setRightComponent(jScrollPane1);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1)
+            .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1)
+            .addComponent(jScrollPane1)
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.jTextArea2.setText("");
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        String command = jComboBox1.getSelectedItem().toString() + "\n";
-        if (!command.equals("Select A Command\n")){
-            this.jTextArea2.append(command);
-        }
-    }//GEN-LAST:event_jComboBox1ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables
 }
