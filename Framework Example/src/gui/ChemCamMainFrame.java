@@ -4,25 +4,16 @@
  * and open the template in the editor.
  */
 package gui;
-import generic.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.io.IOException;
 
 /**
  *
  * @author truol014
  */
 public class ChemCamMainFrame extends javax.swing.JFrame {
-
-    /**
-     * Creates new form ChemCamMainFrame
-     */
+    // Creates new form ChemCamMainFrame
     public ChemCamMainFrame() {
         initComponents();
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -58,7 +49,6 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     /**
      * @param args the command line arguments
      */
@@ -75,21 +65,10 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ChemCamMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ChemCamMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ChemCamMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ChemCamMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
+        // Create and display the form
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -101,11 +80,11 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
                     client.start();
                 } 
 		catch (Exception e) {
+                    System.out.println("Exception Starting Controller and Agent Threads: " + e);
                 }
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static gui.ChemCamControllerPanel chemCamAgentPanel1;
     private static gui.ChemCamAgentPanel chemCamControllerPanel1;

@@ -9,8 +9,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -18,58 +16,53 @@ import java.util.logging.Logger;
  */
 public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
     private final int port = 9011;
-    public ServerSocket ControllerServerSocket;
-    public Socket ControllerSocket;
+    public ServerSocket AgentServerSocket;
+    public Socket AgentSocket;
     public ChemCamAgentPanel() throws IOException{       
         initComponents();
     }
-    /**
-     * Creates new form ChemCamControllerPanel    /**
-     * Creates new form ChemCamControllerPanel
-     */
-    
-    /**
-     * Creates new form ChemCamAgentPanel
-     */
     @Override
     public void run() {
         try{
-            ControllerServerSocket = new ServerSocket(port); 
-            while(true){                                
-                ControllerSocket = ControllerServerSocket.accept();
+            // Establish new Agent Server with port 'port'
+            AgentServerSocket = new ServerSocket(port); 
+            while(true){
+                // Agent server start accepting requests
+                AgentSocket = AgentServerSocket.accept();
                 jTextArea1.append("Agent: Waiting for command\n");                
                 String message;
-                ObjectOutputStream oos;
-                //convert ObjectInputStream object to String
-                //read from socket to ObjectInputStream object
-                try(ObjectInputStream ois = new ObjectInputStream(ControllerSocket.getInputStream())) {
+                // Read from socket to ObjectInputStream object
+                try(ObjectInputStream ois = new ObjectInputStream(AgentSocket.getInputStream())) {
                     //convert ObjectInputStream object to String
                     message = (String)ois.readObject();
                     jTextArea1.append("Agent: Command Received from Controller - " + message.toUpperCase() + "\n");
-                    //create ObjectOutputStream object
-                    oos = new ObjectOutputStream(ControllerSocket.getOutputStream());
-                    //write object to Socket
-                    oos.writeObject("Controller says Hi Agent - " + message);
-                    //close resources
-                    ois.close();
+                    try(ObjectOutputStream oos = new ObjectOutputStream(AgentSocket.getOutputStream())){
+                        // Write object to Socket
+                        oos.writeObject("Controller says Hi Agent - " + message);
+                        oos.close();
+                    }
+                    catch (IOException outputException) {
+                        jTextArea1.append("IOException on ObjectOutputStream writeObject: " + outputException + "\n");
+                    }
+                    ois.close(); 
+                    // Terminate the server if client sends exit request
+                    if(message.equalsIgnoreCase("exit")){
+                        break;
+                    }   
                 }
-                oos.close();
-                //getRoverServerSocket().closeSocket();
-                //terminate the server if client sends exit request
-                if(message.equalsIgnoreCase("exit")) break;                
+                catch (ClassNotFoundException inputException) {
+                    jTextArea1.append("ClassNotFoundException on ObjectInputStream readObject: " + inputException + "\n");
+                }                 
             }
             jTextArea1.append("Agent: Shutting down Socket Agent!!\n");
-            ControllerSocket.close();
-            //close the ServerSocket object            
+            // Close socket 
+            AgentSocket.close();                       
         } 
-        catch (IOException ioe) {
-            System.out.println("IOException on socket listen: " + ioe);
+        catch (IOException socketException) {
+            jTextArea1.append("IOException on ServerSocket listen: " + socketException + "\n");
         } 
-        catch (ClassNotFoundException ex) {
-            Logger.getLogger(ChemCamAgentPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } 	
+        	
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -99,8 +92,6 @@ public class ChemCamAgentPanel extends javax.swing.JPanel implements Runnable{
             .addComponent(jScrollPane1)
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;

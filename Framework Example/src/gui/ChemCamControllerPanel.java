@@ -17,31 +17,19 @@ import java.net.UnknownHostException;
  */
 public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnable{
     private final int port = 9011;
-    public Socket AgentSocket;
+    public Socket ControllerSocket;
     public ChemCamControllerPanel(){
         initComponents();
     }
-    /**
-     * Creates new form ChemCamAgentPanel    /**
-     * Creates new form ChemCamAgentPanel    /**
-     * Creates new form ChemCamAgentPanel    /**
-     * Creates new form ChemCamAgentPanel
-     */
-    
-    /**
-     * Creates new form ChemCamControllerPanel
-     */
     @Override
     public void run(){
-    // TODO Auto-generated method stub
         try{            
             Thread.sleep(2000);
             for(int i = 0; i < 5; i++){
-                AgentSocket = new Socket(InetAddress.getLocalHost(), port);
-                //establish socket connection to server 
-                //socket = new Socket(host.getHostName(), 9876);
-                //write to socket using ObjectOutputStream
-                try(ObjectOutputStream oos = new ObjectOutputStream(AgentSocket.getOutputStream())){
+                // Establish controller socket connection to agent 
+                ControllerSocket = new Socket(InetAddress.getLocalHost(), port);
+                // Write to socket using ObjectOutputStream
+                try(ObjectOutputStream oos = new ObjectOutputStream(ControllerSocket.getOutputStream())){
                     jTextArea1.append("Controller: Sending command to Agent\n");
                     if(i == 4){
                         oos.writeObject("exit");
@@ -49,27 +37,33 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
                     else{
                         oos.writeObject("Test " + i);
                     }
-                    //read the server response message
-                    try(ObjectInputStream ois = new ObjectInputStream(AgentSocket.getInputStream())){
+                    // Read the agent response message
+                    try(ObjectInputStream ois = new ObjectInputStream(ControllerSocket.getInputStream())){
                         String message = (String) ois.readObject();
-                        jTextArea1.append("Controller: Message from Agent - " + message.toUpperCase() + "\n");
-                        //close resources
+                        jTextArea1.append("Controller: Message from Agent - " + message.toUpperCase() + "\n");    
                         ois.close();
                     }
+                    catch(ClassNotFoundException inputException){
+                        jTextArea1.append("ClassNotFoundException on ObjectInputStream readObject" + inputException + "\n");
+                    }
                     oos.close();
+                    // Close socket
+                    ControllerSocket.close();
+                    // Sleeping in a loop! -_-
+                    Thread.sleep(1000);
                 }
-                Thread.sleep(1000);
-                AgentSocket.close();
             }    
         }
-        catch (UnknownHostException uhe) {
-            jTextArea1.append("Controller: UnknownHostException on socket connecting: " + uhe);
+        catch(UnknownHostException socketException){
+            jTextArea1.append("UnknownHostException on Socket connect: " + socketException + "\n");
         }
-        catch (IOException | InterruptedException | ClassNotFoundException error) {
-            jTextArea1.append("Controller: Error:" + error.getMessage() + "\n");
+        catch(InterruptedException threadException){
+            jTextArea1.append("InterruptedException on Thread sleep: " + threadException + "\n");
+        }
+        catch(IOException outputException){
+            jTextArea1.append("IOException on ObjectOutputStream writeObject" + outputException + "\n");
         }
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -174,19 +168,15 @@ public class ChemCamControllerPanel extends javax.swing.JPanel implements Runnab
             .addComponent(jSplitPane1)
         );
     }// </editor-fold>//GEN-END:initComponents
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         this.jTextArea2.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         String command = jComboBox1.getSelectedItem().toString() + "\n";
         if (!command.equals("Select A Command\n")){
             this.jTextArea2.append(command);
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
