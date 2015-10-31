@@ -33,6 +33,7 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jSplitPane1.setDividerSize(2);
         jSplitPane1.setLeftComponent(chemCamAgentPanel1);
         jSplitPane1.setRightComponent(chemCamControllerPanel1);
 
