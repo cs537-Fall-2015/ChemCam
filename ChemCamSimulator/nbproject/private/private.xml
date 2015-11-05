@@ -3,15 +3,23 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/Framework%20Example/src/generic/RoverClientRunnable.java</file>
-            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/Framework%20Example/src/gui/ChemCamAgentPanel.java</file>
-            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/Framework%20Example/src/generic/RoverThread.java</file>
-            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/Framework%20Example/src/generic/RoverThreadFactory.java</file>
-            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/Framework%20Example/src/gui/ChemCamControllerPanel.java</file>
-            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/Framework%20Example/src/generic/RoverServerRunnable.java</file>
-            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/Framework%20Example/src/gui/ChemCamMainFrame.java</file>
-            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/Framework%20Example/src/generic/RoverSocket.java</file>
-            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/Framework%20Example/src/generic/RoverServerSocket.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/gui/MainFrame.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/chemcam/ControllerSocket.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/chemcam/AgentRunnable.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/json/GlobalReader.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/chemcam/ControllerRunnable.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/chemcam/AgentSocket.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/chemcam/RoverThread.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/nbproject/build-impl.xml</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/gui/ControllerPanel.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/chemcam/RoverThreadFactory.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/chemcam/RoverThreadHandler.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/json/ReadFromJSON.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/json/WriteToJSON.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/gui/AgentPanel.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/json/MyWriter.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/json/MyClassHere.java</file>
+            <file>file:/C:/Users/truol014/Desktop/Classes/ChemCam/ChemCamSimulator/src/json/Constants.java</file>
         </group>
     </open-files>
 </project-private>

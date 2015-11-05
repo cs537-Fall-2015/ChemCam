@@ -9,9 +9,9 @@ package gui;
  *
  * @author truol014
  */
-public class ChemCamMainFrame extends javax.swing.JFrame {
-    // Creates new form ChemCamMainFrame
-    public ChemCamMainFrame() {
+public class MainFrame extends javax.swing.JFrame {
+    // Creates new form MainFrame
+    public MainFrame() {
         initComponents();
     }
     /**
@@ -24,18 +24,14 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        chemCamAgentPanel1 = new gui.ChemCamControllerPanel();
-        try {
-            chemCamControllerPanel1 = new gui.ChemCamAgentPanel();
-        } catch (java.io.IOException e1) {
-            e1.printStackTrace();
-        }
+        controllerPanel1 = new gui.ControllerPanel();
+        agentPanel1 = new gui.AgentPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jSplitPane1.setDividerSize(2);
-        jSplitPane1.setLeftComponent(chemCamAgentPanel1);
-        jSplitPane1.setRightComponent(chemCamControllerPanel1);
+        jSplitPane1.setLeftComponent(controllerPanel1);
+        jSplitPane1.setRightComponent(agentPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -67,28 +63,25 @@ public class ChemCamMainFrame extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ChemCamMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         // Create and display the form
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new ChemCamMainFrame().setVisible(true);		
-		try {
-                    Thread controller = new Thread(chemCamControllerPanel1);
-                    Thread client = new Thread(chemCamAgentPanel1);
-                    controller.start();
-                    client.start();
+                new MainFrame().setVisible(true);
+                try{
+                    agentPanel1.agentThread.start();
                 } 
-		catch (Exception e) {
-                    System.out.println("Exception Starting Controller and Agent Threads: " + e);
-                }
+		catch(Exception e){
+                    System.out.println("Exception Starting Agent Thread: " + e);
+                }               
             }
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private static gui.ChemCamControllerPanel chemCamAgentPanel1;
-    private static gui.ChemCamAgentPanel chemCamControllerPanel1;
+    private static gui.AgentPanel agentPanel1;
+    private static gui.ControllerPanel controllerPanel1;
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 }
