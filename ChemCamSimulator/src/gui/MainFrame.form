@@ -40,7 +40,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
       <SubComponents>
-        <Component class="gui.ChemCamControllerPanel" name="chemCamAgentPanel1">
+        <Component class="gui.ControllerPanel" name="controllerPanel1">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
           </AuxValues>
@@ -50,7 +50,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="gui.ChemCamAgentPanel" name="chemCamControllerPanel1">
+        <Component class="gui.AgentPanel" name="agentPanel1">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
           </AuxValues>
