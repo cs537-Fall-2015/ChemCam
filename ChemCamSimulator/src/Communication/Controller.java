@@ -1,6 +1,8 @@
-package communication;
+package Communication;
 
 import java.util.ArrayList;
+
+import com.sun.xml.internal.bind.v2.runtime.Coordinator;
 
 public class Controller {
 
@@ -18,5 +20,42 @@ public class Controller {
 		list.add(new Model("CCAM_COOLER_OFF"));
 		list.add(new Model("CCAM_POWER_OFF"));
 	}
+
+	private Coordinator coordinates;
+    public void setCoordinates(Coordinator value) {
+        coordinates = value;
+    }
+    public Coordinator getCoordinates() {
+        return coordinates;
+    }
+
+    public void Rover(Coordinator coordinatesValue) {
+        setCoordinates(coordinatesValue);
+    }
+
+    public void receiveCommands(String commands) throws Exception {
+        for (char command : commands.toCharArray()) {
+            if (!receiveSingleCommand(command)) {
+                break;
+            }
+        }
+    }
+
+    public boolean receiveSingleCommand(char command) throws Exception {
+        switch(Character.toUpperCase(command)) {
+            case 'L':
+                getCoordinates();
+                return true;
+            case 'R':
+                getCoordinates();
+                return true;
+            default:
+                throw new Exception("Command " + command + " is unknown.");
+        }
+    }
+
+    public String getPosition() {
+        return getCoordinates().toString();
+    }
 
 }
