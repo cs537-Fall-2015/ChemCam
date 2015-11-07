@@ -380,37 +380,32 @@ public class ControllerPanel extends javax.swing.JPanel{
             }
         }
         if(send){
-            if(controllerSendThread == null){
-                try{
-                    controller = new ControllerRunnable(9011, null){
-                        @Override
-                        public void run(){
-                            try{
-                                ObjectOutputStream oos = new ObjectOutputStream(getControllerSocket().getSocket().getOutputStream());
-                                ObjectInputStream ois = new ObjectInputStream(getControllerSocket().getSocket().getInputStream());
-                                controllerSendThread.sleep(2000);
-                                jTextArea1.append("Controller: Sending command to Agent\n");
-                                oos.writeObject(commandsJSON);
-                                controllerSendThread.sleep(1000);
-                                ois.close();
-                                oos.close(); 
-                                closeAll();
-                            }
-                            catch(InterruptedException | IOException exception){
-                                jTextArea1.append("Exception: " + exception + "\n");
-                            }
+            try{
+                controller = new ControllerRunnable(9011, null){
+                    @Override
+                    public void run(){
+                        try{
+                            ObjectOutputStream oos = new ObjectOutputStream(getControllerSocket().getSocket().getOutputStream());
+                            ObjectInputStream ois = new ObjectInputStream(getControllerSocket().getSocket().getInputStream());
+                            controllerSendThread.sleep(2000);
+                            jTextArea1.append("Controller: Sending command to Agent\n");
+                            oos.writeObject(commandsJSON);
+                            controllerSendThread.sleep(1000);
+                            ois.close();
+                            oos.close(); 
+                            closeAll();
                         }
-                    };
-                }
-                catch(IOException socketException){
-                    jTextArea2.append("IOException on creating new socket: " + socketException + "\n");
-                }
-                controllerSendThread = new RoverThread(controller, "Controller Thread");
-                controllerSendThread.start();
+                        catch(InterruptedException | IOException exception){
+                            jTextArea1.append("Exception: " + exception + "\n");
+                        }
+                    }
+                };
             }
-            else{
-                controllerSendThread.start();
-            }            
+            catch(IOException socketException){
+                jTextArea2.append("IOException on creating new socket: " + socketException + "\n");
+            }
+            controllerSendThread = new RoverThread(controller, "Controller Thread");
+            controllerSendThread.start();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 

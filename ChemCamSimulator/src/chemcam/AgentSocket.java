@@ -2,7 +2,7 @@ package chemcam;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-public final class AgentSocket {
+public final class AgentSocket{
     private ServerSocket agentSocket;
     private Socket socket;
     private int port;
