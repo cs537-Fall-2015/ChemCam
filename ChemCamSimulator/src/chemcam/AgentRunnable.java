@@ -1,5 +1,5 @@
 package chemcam;
-import java.io.IOException;
+import java.io.*;
 public abstract class AgentRunnable implements Runnable{
     private AgentSocket agentSocket;
     public AgentRunnable(int port) throws IOException{

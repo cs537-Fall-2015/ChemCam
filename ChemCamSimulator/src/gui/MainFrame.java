@@ -71,7 +71,7 @@ public class MainFrame extends javax.swing.JFrame {
             public void run() {
                 new MainFrame().setVisible(true);
                 try{
-                    agentPanel1.agentThread.start();
+                    agentPanel1.agentServerThread.start();
                 } 
 		catch(Exception e){
                     System.out.println("Exception Starting Agent Thread: " + e);
