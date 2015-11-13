@@ -1,7 +1,7 @@
 /*
  * @author truol014
  */
-package Main;
+package main;
 public class MainFrame extends javax.swing.JFrame {
     private static MainFrame instance = null;    
     private javax.swing.JSplitPane jSplitPane1;
