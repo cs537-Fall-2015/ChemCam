@@ -1,7 +1,7 @@
 /*
  * @author truol014
  */
-package chemCam_testMain;
+package Main;
 import chemcam.*;
 import java.io.*;
 import org.json.simple.JSONObject;
@@ -18,19 +18,19 @@ public class AgentPanel extends javax.swing.JPanel{
                 public void run(){
                     try{
                         while(true){
-                            jTextArea1.append("Agent1: Waiting for command.\n");
+                            jTextArea1.append("Agent1 - Server Thread: Waiting for command.\n");
                             getRunnableServerSocket().openSocket();
                             ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream());
                             ObjectOutputStream oos = new ObjectOutputStream(getRunnableServerSocket().getSocket().getOutputStream());                          
                             JSONObject commandsList = (JSONObject)ois.readObject();
                             if(commandsList.containsKey("Terminate")){
-                                jTextArea1.append("Agent1: Shutdown Command Received from Controller.\n");
-                                jTextArea1.append("Agent1: Shutting Down.\n");
+                                jTextArea1.append("Agent1 - Server Thread: Shutdown Command Received from Controller.\n");
+                                jTextArea1.append("Agent1 - Server Thread: Shutting Down.\n");
                                 break;
                             }
                             else{
-                                jTextArea1.append("Agent1: Commands Received from Controller.\n");
-                                jTextArea1.append("Agent1: Work is Being Processed.\n");
+                                jTextArea1.append("Agent1 - Server Thread: Commands Received from Controller.\n");
+                                jTextArea1.append("Agent1 - Server Thread: Work is Being Processed.\n");
                                 executeCommands(commandsList);
                             }
                             ois.close();
@@ -49,10 +49,13 @@ public class AgentPanel extends javax.swing.JPanel{
         }
         agentListenThread = new RoverThread(agent, "Agent Server Thread");
     }
-    private void executeCommands(JSONObject commandsList){        
+    private void executeCommands(JSONObject commandsList){
+        // TO_DO
         JSONObject report = new JSONObject();
     } 
-    
+    public RoverThread getAgentListenThread(){
+        return agentListenThread;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

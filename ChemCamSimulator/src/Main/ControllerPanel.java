@@ -1,20 +1,9 @@
 /*
  * @author truol014
  */
-package chemCam_testMain;
+package Main;
 import chemcam.*;
-<<<<<<< HEAD:ChemCamSimulator/src/gui/ControllerPanel.java
 import java.io.*;
-=======
-import chemCam_testMain.ControllerPanel;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-import javax.swing.JOptionPane;
-
->>>>>>> 627a16564e19fa27b7a23519591f4bdebed7c7f4:ChemCamSimulator/src/chemCam_testMain/ControllerPanel.java
 import org.json.simple.JSONObject;
 import javax.swing.JOptionPane;
 public class ControllerPanel extends javax.swing.JPanel{
@@ -29,14 +18,15 @@ public class ControllerPanel extends javax.swing.JPanel{
                 public void run(){
                     try{
                         while(true){
-                            jTextArea1.append("Controller: Waiting for report.\n");
+                            jTextArea1.append("Controller - Server Thread: Waiting for report.\n");
                             getRunnableServerSocket().openSocket();
                             ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream());
                             ObjectOutputStream oos = new ObjectOutputStream(getRunnableServerSocket().getSocket().getOutputStream());                          
                             JSONObject report = (JSONObject)ois.readObject();
                             if(!report.isEmpty()){
-                                jTextArea1.append("Controller: Report recieved from Agent.\n");
-                                jTextArea1.append("Controller: Storing report to database.\n");
+                                jTextArea1.append("Controller - Server Thread: Report recieved from Agent.\n");
+                                jTextArea1.append("Controller - Server Thread: Storing report to database.\n");
+                                // TO_DO
                             }
                             ois.close();
                             oos.close();                            
@@ -53,6 +43,9 @@ public class ControllerPanel extends javax.swing.JPanel{
         }
         controllerListenThread = new RoverThread(controller, "Controller Server Thread");
         jTextArea2.setText("Command Sequence:\n");
+    }
+    public RoverThread getControllerListenThread(){
+        return controllerListenThread;
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -421,7 +414,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                             ObjectOutputStream oos = new ObjectOutputStream(getRunnableSocket().getSocket().getOutputStream());
                             ObjectInputStream ois = new ObjectInputStream(getRunnableSocket().getSocket().getInputStream());
                             controllerConnectThread.sleep(2000);
-                            jTextArea1.append("Controller: Sending command to Agent\n");
+                            jTextArea1.append("Controller - Client Thread: Sending command to Agent\n");
                             oos.writeObject(commandsJSON);
                             controllerConnectThread.sleep(1000);
                             ois.close();
