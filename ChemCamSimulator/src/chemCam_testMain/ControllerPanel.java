@@ -1,9 +1,20 @@
 /*
  * @author truol014
  */
-package gui;
+package chemCam_testMain;
 import chemcam.*;
+<<<<<<< HEAD:ChemCamSimulator/src/gui/ControllerPanel.java
 import java.io.*;
+=======
+import chemCam_testMain.ControllerPanel;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import javax.swing.JOptionPane;
+
+>>>>>>> 627a16564e19fa27b7a23519591f4bdebed7c7f4:ChemCamSimulator/src/chemCam_testMain/ControllerPanel.java
 import org.json.simple.JSONObject;
 import javax.swing.JOptionPane;
 public class ControllerPanel extends javax.swing.JPanel{

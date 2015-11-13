@@ -1,7 +1,7 @@
 /*
  * @author truol014
  */
-package gui;
+package chemCam_testMain;
 import chemcam.*;
 import java.io.*;
 import org.json.simple.JSONObject;

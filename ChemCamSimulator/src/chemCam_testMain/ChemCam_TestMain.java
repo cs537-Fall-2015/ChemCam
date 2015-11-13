@@ -1,10 +1,26 @@
 /*
+<<<<<<< HEAD:ChemCamSimulator/src/gui/MainFrame.java
  * @author truol014
  */
 package gui;
 public class MainFrame extends javax.swing.JFrame {
+=======
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package chemCam_testMain;
+
+import chemCam_testMain.ChemCam_TestMain;
+
+/**
+ *
+ * @author truol014
+ */
+public class ChemCam_TestMain extends javax.swing.JFrame {
+>>>>>>> 627a16564e19fa27b7a23519591f4bdebed7c7f4:ChemCamSimulator/src/chemCam_testMain/ChemCam_TestMain.java
     // Creates new form MainFrame
-    public MainFrame() {
+    public ChemCam_TestMain() {
         initComponents();
     }
     /**
@@ -17,8 +33,8 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        controllerPanel1 = new gui.ControllerPanel();
-        agentPanel1 = new gui.AgentPanel();
+        controllerPanel1 = new chemCam_testMain.ControllerPanel();
+        agentPanel1 = new chemCam_testMain.AgentPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -56,13 +72,13 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ChemCam_TestMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         // Create and display the form
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new MainFrame().setVisible(true);
+                new ChemCam_TestMain().setVisible(true);
                 try{
                     agentPanel1.agentListenThread.start();
                     controllerPanel1.controllerListenThread.start();
@@ -74,8 +90,8 @@ public class MainFrame extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private static gui.AgentPanel agentPanel1;
-    private static gui.ControllerPanel controllerPanel1;
+    private static chemCam_testMain.AgentPanel agentPanel1;
+    private static chemCam_testMain.ControllerPanel controllerPanel1;
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 }
