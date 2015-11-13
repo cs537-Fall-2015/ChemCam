@@ -1,30 +1,51 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package chemCam_testMain;
-import chemcam.*;
-import chemCam_testMain.ControllerPanel;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-import javax.swing.JOptionPane;
-
-import org.json.simple.JSONObject;
-/**
- *
  * @author truol014
  */
+package Main;
+import chemcam.*;
+import java.io.*;
+import org.json.simple.JSONObject;
+import javax.swing.JOptionPane;
 public class ControllerPanel extends javax.swing.JPanel{
-    private ControllerRunnable controller = null;
-    public RoverThread controllerSendThread = null;
-    public RoverThread controllerTerminateThread = null;
+    public RoverThread controllerListenThread;
+    private RoverThread controllerConnectThread;
     public ControllerPanel(){
-        initComponents();
-        jTextArea2.setText("Command Sequence:\n");        
+        ControllerRunnable controller = null;
+        initComponents();        
+        try{
+            controller = new ControllerRunnable(10011){
+                @Override
+                public void run(){
+                    try{
+                        while(true){
+                            jTextArea1.append("Controller - Server Thread: Waiting for report.\n");
+                            getRunnableServerSocket().openSocket();
+                            ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream());
+                            ObjectOutputStream oos = new ObjectOutputStream(getRunnableServerSocket().getSocket().getOutputStream());                          
+                            JSONObject report = (JSONObject)ois.readObject();
+                            if(!report.isEmpty()){
+                                jTextArea1.append("Controller - Server Thread: Report recieved from Agent.\n");
+                                jTextArea1.append("Controller - Server Thread: Storing report to database.\n");
+                                // TO_DO
+                            }
+                            ois.close();
+                            oos.close();                            
+                        }
+                    } 
+                    catch(IOException | ClassNotFoundException exception) {
+                        jTextArea1.append("Exception: " + exception + "\n");
+                    } 
+                }
+            };
+        }
+        catch(IOException socketException){
+            jTextArea1.append("IOException on creating new socket: " + socketException + "\n");
+        }
+        controllerListenThread = new RoverThread(controller, "Controller Server Thread");
+        jTextArea2.setText("Command Sequence:\n");
+    }
+    public RoverThread getControllerListenThread(){
+        return controllerListenThread;
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -338,6 +359,7 @@ public class ControllerPanel extends javax.swing.JPanel{
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String[] commandList = jTextArea2.getText().split("\n");
         final JSONObject commandsJSON = new JSONObject();
+        ControllerRunnable controller = null;
         boolean send = true;
         for(int i = 0; i < commandList.length; i++){
             if(send){
@@ -351,7 +373,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                             break;
                         }
                         else{
-                            commandsJSON.put("Command " + i , commandList[i]);
+                            commandsJSON.put(i, commandList[i]);
                             break;
                         }
                     case "CCAM_COOLER_ON":
@@ -361,7 +383,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                             break;
                         }
                         else{
-                            commandsJSON.put("Command " + i , commandList[i]);
+                            commandsJSON.put(i, commandList[i]);
                             break;
                         }
                     case "CCAM_LASER_ON":
@@ -371,11 +393,11 @@ public class ControllerPanel extends javax.swing.JPanel{
                             break;
                         }
                         else{
-                            commandsJSON.put("Command " + i , commandList[i]);
+                            commandsJSON.put(i, commandList[i]);
                             break;
                         }
                     default:
-                        commandsJSON.put("Command " + i , commandList[i]);
+                        commandsJSON.put(i, commandList[i]);
                         break;
                 }
             }
@@ -383,21 +405,21 @@ public class ControllerPanel extends javax.swing.JPanel{
                 break;
             }
         }
-        if(send){
+        if(send && !commandsJSON.isEmpty()){
             try{
                 controller = new ControllerRunnable(9011, null){
                     @Override
                     public void run(){
                         try{
-                            ObjectOutputStream oos = new ObjectOutputStream(getControllerSocket().getSocket().getOutputStream());
-                            ObjectInputStream ois = new ObjectInputStream(getControllerSocket().getSocket().getInputStream());
-                            controllerSendThread.sleep(2000);
-                            jTextArea1.append("Controller: Sending command to Agent\n");
+                            ObjectOutputStream oos = new ObjectOutputStream(getRunnableSocket().getSocket().getOutputStream());
+                            ObjectInputStream ois = new ObjectInputStream(getRunnableSocket().getSocket().getInputStream());
+                            controllerConnectThread.sleep(2000);
+                            jTextArea1.append("Controller - Client Thread: Sending command to Agent\n");
                             oos.writeObject(commandsJSON);
-                            controllerSendThread.sleep(1000);
+                            controllerConnectThread.sleep(1000);
                             ois.close();
                             oos.close(); 
-                            closeAll();
+                            closeAllRunnable();
                         }
                         catch(InterruptedException | IOException exception){
                             jTextArea1.append("Exception: " + exception + "\n");
@@ -408,26 +430,27 @@ public class ControllerPanel extends javax.swing.JPanel{
             catch(IOException socketException){
                 jTextArea2.append("IOException on creating new socket: " + socketException + "\n");
             }
-            controllerSendThread = new RoverThread(controller, "Controller Thread");
-            controllerSendThread.start();
+            controllerConnectThread = new RoverThread(controller, "Controller Client Thread");
+            controllerConnectThread.start();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         final JSONObject commandsJSON = new JSONObject();
+        ControllerRunnable controller = null;
         commandsJSON.put("Terminate", "Shutdown");
         try{
             controller = new ControllerRunnable(9011, null){
                 @Override
                 public void run(){
                     try{
-                        ObjectOutputStream oos = new ObjectOutputStream(getControllerSocket().getSocket().getOutputStream());
-                        ObjectInputStream ois = new ObjectInputStream(getControllerSocket().getSocket().getInputStream());
+                        ObjectOutputStream oos = new ObjectOutputStream(getRunnableSocket().getSocket().getOutputStream());
+                        ObjectInputStream ois = new ObjectInputStream(getRunnableSocket().getSocket().getInputStream());
                         jTextArea1.append("Controller: Sending command to Agent\n");
                         oos.writeObject(commandsJSON);
                         ois.close();
                         oos.close(); 
-                        closeAll();
+                        closeAllRunnable();
                     }
                     catch(IOException exception){
                         jTextArea1.append("Exception: " + exception + "\n");
@@ -438,8 +461,8 @@ public class ControllerPanel extends javax.swing.JPanel{
         catch(IOException socketException){
             jTextArea2.append("IOException on creating new socket: " + socketException + "\n");
         }
-        controllerTerminateThread = new RoverThread(controller, "Controller Thread");
-        controllerTerminateThread.start();
+        controllerConnectThread = new RoverThread(controller, "Controller Client Thread");
+        controllerConnectThread.start();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
