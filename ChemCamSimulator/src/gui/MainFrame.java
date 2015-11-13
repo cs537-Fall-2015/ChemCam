@@ -1,14 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package gui;
-
-/**
- *
  * @author truol014
  */
+package gui;
 public class MainFrame extends javax.swing.JFrame {
     // Creates new form MainFrame
     public MainFrame() {
@@ -71,7 +64,8 @@ public class MainFrame extends javax.swing.JFrame {
             public void run() {
                 new MainFrame().setVisible(true);
                 try{
-                    agentPanel1.agentServerThread.start();
+                    agentPanel1.agentListenThread.start();
+                    controllerPanel1.controllerListenThread.start();
                 } 
 		catch(Exception e){
                     System.out.println("Exception Starting Agent Thread: " + e);
