@@ -1,4 +1,4 @@
-package communication;
+package Communication;
 
 public class Model {
 
