@@ -1,7 +1,7 @@
 /*
  * @author truol014
  */
-package Main;
+package main;
 import chemcam.*;
 import java.io.*;
 import org.json.simple.JSONObject;
