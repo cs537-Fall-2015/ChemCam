@@ -1,5 +1,5 @@
 /*
- * @author truol014
+ * @author Loc Truong
  */
 package main;
 import javax.swing.*;
@@ -23,10 +23,10 @@ public class Main {
                     MainFrame.getControllerPanel().getControllerListenThread().start();
                 }
                 catch(Exception e){
-                    System.out.println("Exception Starting Agent Thread: " + e);
+                    Utils.log("Exception Starting Server Threads: " + e);
                 }
-                    }
-                });
+            }
+        });
     }
     
 }
