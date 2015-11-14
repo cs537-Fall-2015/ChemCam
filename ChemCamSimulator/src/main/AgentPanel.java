@@ -1,23 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package gui;
-import chemcam.*;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import org.json.simple.JSONObject;
-/**
- *
  * @author truol014
  */
+package main;
+import chemcam.*;
+import java.io.*;
+import org.json.simple.JSONObject;
+
 public class AgentPanel extends javax.swing.JPanel{
-    private AgentRunnable agent;
-    public RoverThread agentServerThread;
-    public AgentPanel(){       
+    public RoverThread agentListenThread;
+    
+    public AgentPanel(){ 
+        AgentRunnable agent = null;
         initComponents();   
         try{
             agent = new AgentRunnable(9011){
@@ -25,24 +18,25 @@ public class AgentPanel extends javax.swing.JPanel{
                 public void run(){
                     try{
                         while(true){
-                            jTextArea1.append("Agent: Waiting for command\n");
-                            getAgentSocket().openSocket();
-                            ObjectInputStream ois = new ObjectInputStream(getAgentSocket().getSocket().getInputStream());
-                            ObjectOutputStream oos = new ObjectOutputStream(getAgentSocket().getSocket().getOutputStream());
-                            try{                               
-                                JSONObject message = (JSONObject)ois.readObject();
-                                jTextArea1.append("Agent: Command Received from Controller\n" + message.toJSONString() + "\n");
-                                if(message.containsKey("Terminate")){
-                                    break;
-                                }
+                            jTextArea1.append("Agent1 - Server Thread: Waiting for command.\n");
+                            getRunnableServerSocket().openSocket();
+                            ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream());
+                            ObjectOutputStream oos = new ObjectOutputStream(getRunnableServerSocket().getSocket().getOutputStream());                          
+                            JSONObject commandsList = (JSONObject)ois.readObject();
+                            if(commandsList.containsKey("Terminate")){
+                                jTextArea1.append("Agent1 - Server Thread: Shutdown Command Received from Controller.\n");
+                                jTextArea1.append("Agent1 - Server Thread: Shutting Down.\n");
+                                break;
                             }
-                            catch(EOFException EX){
-                                //Do nothing...
+                            else{
+                                jTextArea1.append("Agent1 - Server Thread: Commands Received from Controller.\n");
+                                jTextArea1.append("Agent1 - Server Thread: Work is Being Processed.\n");
+                                executeCommands(commandsList);
                             }
                             ois.close();
                             oos.close();                            
                         }
-                        closeAll();
+                        closeAllRunnable();
                     } 
                     catch(IOException | ClassNotFoundException exception) {
                         jTextArea1.append("Exception: " + exception + "\n");
@@ -53,7 +47,14 @@ public class AgentPanel extends javax.swing.JPanel{
         catch(IOException socketException){
             jTextArea1.append("IOException on creating new socket: " + socketException + "\n");
         }
-        agentServerThread = new RoverThread(agent, "Agent Server Thread");
+        agentListenThread = new RoverThread(agent, "Agent Server Thread");
+    }
+    private void executeCommands(JSONObject commandsList){
+        // TO_DO
+        JSONObject report = new JSONObject();
+    } 
+    public RoverThread getAgentListenThread(){
+        return agentListenThread;
     }
     /**
      * This method is called from within the constructor to initialize the form.
