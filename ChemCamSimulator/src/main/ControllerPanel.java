@@ -1,5 +1,5 @@
 /*
- * @author truol014
+ * @author Loc Truong
  */
 package main;
 import chemcam.*;
@@ -33,13 +33,13 @@ public class ControllerPanel extends javax.swing.JPanel{
                         }
                     } 
                     catch(IOException | ClassNotFoundException exception) {
-                        jTextArea1.append("Exception: " + exception + "\n");
+                        Utils.log("Exception: " + exception + "\n");
                     } 
                 }
             };
         }
         catch(IOException socketException){
-            jTextArea1.append("IOException on creating new socket: " + socketException + "\n");
+            Utils.log("IOException on creating new socket: " + socketException + "\n");
         }
         controllerListenThread = new RoverThread(controller, "Controller Server Thread");
         jTextArea2.setText("Command Sequence:\n");
@@ -56,7 +56,7 @@ public class ControllerPanel extends javax.swing.JPanel{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jOptionPane1 = new javax.swing.JOptionPane();
+        jDialog1 = new javax.swing.JDialog();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -69,6 +69,17 @@ public class ControllerPanel extends javax.swing.JPanel{
         jTextArea2 = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
 
         jSplitPane1.setDividerSize(2);
 
@@ -116,7 +127,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCheckBox1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -148,7 +159,7 @@ public class ControllerPanel extends javax.swing.JPanel{
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -166,20 +177,10 @@ public class ControllerPanel extends javax.swing.JPanel{
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSplitPane1)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(jOptionPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSplitPane1)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(jOptionPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -191,15 +192,15 @@ public class ControllerPanel extends javax.swing.JPanel{
             switch(command){
                 case "CCAM_POWER_OFF":
                     if(!jTextArea2.getText().contains("CCAM_POWER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_COOLER_ON") && !jTextArea2.getText().contains("CCAM_COOLER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Cooler needs to be turned OFF before turning OFF Power!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Cooler needs to be turned OFF before turning OFF Power!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_LASER_ON") && !jTextArea2.getText().contains("CCAM_LASER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Laser needs to be turned OFF before turning OFF Power", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Laser needs to be turned OFF before turning OFF Power", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else{
@@ -208,11 +209,11 @@ public class ControllerPanel extends javax.swing.JPanel{
                     break;
                 case "CCAM_COOLER_ON":
                     if(!jTextArea2.getText().contains("CCAM_POWER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else{
@@ -221,15 +222,15 @@ public class ControllerPanel extends javax.swing.JPanel{
                     break;
                 case "CCAM_COOLER_OFF":
                     if(!jTextArea2.getText().contains("CCAM_POWER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(!jTextArea2.getText().contains("CCAM_COOLER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Cooler is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Cooler is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else{
@@ -238,11 +239,11 @@ public class ControllerPanel extends javax.swing.JPanel{
                     break;
                 case "CCAM_LASER_ON":
                     if(!jTextArea2.getText().contains("CCAM_POWER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else{
@@ -251,15 +252,15 @@ public class ControllerPanel extends javax.swing.JPanel{
                     break;
                 case "CCAM_LASER_OFF":
                     if(!jTextArea2.getText().contains("CCAM_POWER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(!jTextArea2.getText().contains("CCAM_LASER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Laser is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Laser is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else{
@@ -268,11 +269,11 @@ public class ControllerPanel extends javax.swing.JPanel{
                     break;
                 case "CCAM_CWL_WARM":
                     if(!jTextArea2.getText().contains("CCAM_POWER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else{
@@ -281,11 +282,11 @@ public class ControllerPanel extends javax.swing.JPanel{
                     break;
                 case "CCAM_LIBS_WARM":
                     if(!jTextArea2.getText().contains("CCAM_POWER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else{
@@ -294,15 +295,15 @@ public class ControllerPanel extends javax.swing.JPanel{
                     break;
                 case "CCAM_SET_FOCUS":
                     if(!jTextArea2.getText().contains("CCAM_POWER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(!jTextArea2.getText().contains("CCAM_CWL_WARM")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Continuous-Wave Laser is not Warmed Up!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Continuous-Wave Laser is not Warmed Up!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else{
@@ -311,35 +312,35 @@ public class ControllerPanel extends javax.swing.JPanel{
                     break;
                 case "CCAM_FIRE_LASER":
                     if(!jTextArea2.getText().contains("CCAM_POWER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Power is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(!jTextArea2.getText().contains("CCAM_COOLER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Cooler is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Cooler is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_COOLER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Cooler is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Cooler is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(!jTextArea2.getText().contains("CCAM_LASER_ON")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Laser is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Laser is not ON!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(jTextArea2.getText().contains("CCAM_LASER_OFF")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Laser is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Laser is already OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(!jTextArea2.getText().contains("CCAM_SET_FOCUS")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Focus is not Set!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Focus is not Set!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else if(!jTextArea2.getText().contains("CCAM_LIBS_WARM")){
-                        JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Laser-Induced Breakdown Spectroscopy is not Warmed Up!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Chemical Camera's Laser-Induced Breakdown Spectroscopy is not Warmed Up!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                     else{
@@ -368,7 +369,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                         break;
                     case "CCAM_POWER_ON":
                         if(!jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                            JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Power is not going to be turned OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not going to be turned OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                             send = false;
                             break;
                         }
@@ -378,7 +379,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                         }
                     case "CCAM_COOLER_ON":
                         if(!jTextArea2.getText().contains("CCAM_COOLER_OFF")){
-                            JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Cooler is not going to be turned OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Chemical Camera's Cooler is not going to be turned OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                             send = false;
                             break;
                         }
@@ -388,7 +389,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                         }
                     case "CCAM_LASER_ON":
                         if(!jTextArea2.getText().contains("CCAM_LASER_OFF")){
-                            JOptionPane.showMessageDialog(ControllerPanel.jOptionPane1, "Chemical Camera's Laser is not going to be turned OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Chemical Camera's Laser is not going to be turned OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
                             send = false;
                             break;
                         }
@@ -413,22 +414,22 @@ public class ControllerPanel extends javax.swing.JPanel{
                         try{
                             ObjectOutputStream oos = new ObjectOutputStream(getRunnableSocket().getSocket().getOutputStream());
                             ObjectInputStream ois = new ObjectInputStream(getRunnableSocket().getSocket().getInputStream());
-                            controllerConnectThread.sleep(2000);
+                            RoverThread.sleep(2000);
                             jTextArea1.append("Controller - Client Thread: Sending command to Agent\n");
                             oos.writeObject(commandsJSON);
-                            controllerConnectThread.sleep(1000);
+                            RoverThread.sleep(1000);
                             ois.close();
                             oos.close(); 
                             closeAllRunnable();
                         }
                         catch(InterruptedException | IOException exception){
-                            jTextArea1.append("Exception: " + exception + "\n");
+                            Utils.log("Exception: " + exception + "\n");
                         }
                     }
                 };
             }
             catch(IOException socketException){
-                jTextArea2.append("IOException on creating new socket: " + socketException + "\n");
+                Utils.log("IOException on creating new socket: " + socketException + "\n");
             }
             controllerConnectThread = new RoverThread(controller, "Controller Client Thread");
             controllerConnectThread.start();
@@ -453,13 +454,13 @@ public class ControllerPanel extends javax.swing.JPanel{
                         closeAllRunnable();
                     }
                     catch(IOException exception){
-                        jTextArea1.append("Exception: " + exception + "\n");
+                        Utils.log("Exception: " + exception + "\n");
                     }
                 }
             };
         }
         catch(IOException socketException){
-            jTextArea2.append("IOException on creating new socket: " + socketException + "\n");
+            Utils.log("IOException on creating new socket: " + socketException + "\n");
         }
         controllerConnectThread = new RoverThread(controller, "Controller Client Thread");
         controllerConnectThread.start();
@@ -471,7 +472,7 @@ public class ControllerPanel extends javax.swing.JPanel{
     private javax.swing.JButton jButton3;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JComboBox jComboBox1;
-    private static javax.swing.JOptionPane jOptionPane1;
+    private javax.swing.JDialog jDialog1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
