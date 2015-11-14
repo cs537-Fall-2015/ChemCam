@@ -4,6 +4,11 @@
 package main;
 import chemcam.*;
 import java.io.*;
+import java.util.Set;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 import org.json.simple.JSONObject;
 
 public class AgentPanel extends javax.swing.JPanel{
@@ -34,6 +39,7 @@ public class AgentPanel extends javax.swing.JPanel{
                                 jTextArea1.append("Agent1 - Server Thread: Work is Being Processed.\n");
                                 executeCommands(commandsList);
                             }
+                 
                             ois.close();
                             oos.close();                            
                         }
@@ -50,10 +56,23 @@ public class AgentPanel extends javax.swing.JPanel{
         }
         agentListenThread = new RoverThread(agent, "Agent Server Thread");
     }
-    private void executeCommands(JSONObject commandsList){
+        
+    private void executeCommands(JSONObject commandsList) throws FileNotFoundException{
         // TO_DO
         JSONObject report = new JSONObject();
-    } 
+        int length = commandsList.size();
+        System.out.println(length);
+        FileReader reader = new FileReader("command_data.txt");
+        //reader..read(reader,"command_data.txt");
+        
+        
+	   for(int i = 1; i <= length; i++){
+		   commandsList.get(i);
+	   }
+	   
+        
+        
+    }
     public RoverThread getAgentListenThread(){
         return agentListenThread;
     }
