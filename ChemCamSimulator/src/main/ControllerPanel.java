@@ -3,8 +3,12 @@
  */
 package main;
 import chemcam.*;
+
 import java.io.*;
+import java.util.Set;
+
 import org.json.simple.JSONObject;
+
 import javax.swing.JOptionPane;
 public class ControllerPanel extends javax.swing.JPanel{
     public RoverThread controllerListenThread;
@@ -64,6 +68,7 @@ public class ControllerPanel extends javax.swing.JPanel{
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
@@ -110,6 +115,18 @@ public class ControllerPanel extends javax.swing.JPanel{
                 jButton3ActionPerformed(evt);
             }
         });
+        
+        jButton4.setText("Upload");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try {
+					jButton4ActionPerformed(evt);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        });
 
         jCheckBox1.setText("High Priority");
 
@@ -126,6 +143,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCheckBox1)
                 .addContainerGap(43, Short.MAX_VALUE))
         );
@@ -136,6 +155,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
+                    .addComponent(jButton4)
                     .addComponent(jCheckBox1))
                 .addGap(2, 2, 2))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
@@ -465,11 +485,33 @@ public class ControllerPanel extends javax.swing.JPanel{
         controllerConnectThread = new RoverThread(controller, "Controller Client Thread");
         controllerConnectThread.start();
     }//GEN-LAST:event_jButton3ActionPerformed
+    
+    
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) throws FileNotFoundException{
+    	BufferedReader br = new BufferedReader(new FileReader(new File("src/data/commands.txt").getAbsoluteFile()));
+    	String line = null;
+    	 try {
+			while((line = br.readLine()) != null) {
+				jTextArea2.append(line+"\n");
+				
+
+			 }
+			br.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}   
+
+    	
+    }
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JDialog jDialog1;
