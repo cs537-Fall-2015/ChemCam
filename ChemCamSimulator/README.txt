@@ -1,3 +1,1 @@
-This project was created with multiple java development environments (Eclipse, Netbeans...).
-The core files (libs, source code files) should be there for you to compile and run.
-If you have any issue just run the .jar file...
+Compile and run main.Main
