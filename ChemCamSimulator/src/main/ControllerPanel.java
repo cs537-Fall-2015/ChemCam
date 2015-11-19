@@ -2,18 +2,22 @@
  * @author Loc Truong
  */
 package main;
+import json.Command;
 import chemcam.*;
 import java.io.*;
-import org.json.simple.JSONObject;
+import java.util.*;
+import com.google.gson.*;
 import javax.swing.JOptionPane;
 public class ControllerPanel extends javax.swing.JPanel{
+    int AgentPort = 9111;
+    int ControllerPort = 9011;
     public RoverThread controllerListenThread;
     private RoverThread controllerConnectThread;
     public ControllerPanel(){
         ControllerRunnable controller = null;
         initComponents();        
         try{
-            controller = new ControllerRunnable(10011){
+            controller = new ControllerRunnable(ControllerPort){
                 @Override
                 public void run(){
                     try{
@@ -21,20 +25,20 @@ public class ControllerPanel extends javax.swing.JPanel{
                             jTextArea1.append("Controller - Server Thread: Waiting for report.\n");
                             getRunnableServerSocket().openSocket();
                             ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream());
-                            ObjectOutputStream oos = new ObjectOutputStream(getRunnableServerSocket().getSocket().getOutputStream());                          
-                            JSONObject report = (JSONObject)ois.readObject();
-                            if(!report.isEmpty()){
+                            ObjectOutputStream oos = new ObjectOutputStream(getRunnableServerSocket().getSocket().getOutputStream());  
+                            String jsonString = (String)ois.readObject();
+                            if(!jsonString.isEmpty()){
                                 jTextArea1.append("Controller - Server Thread: Report recieved from Agent.\n");
                                 jTextArea1.append("Controller - Server Thread: Storing report to database.\n");
                                 // TO_DO
                             }
                             ois.close();
-                            oos.close();                            
+                            oos.close();
                         }
                     } 
                     catch(IOException | ClassNotFoundException exception) {
                         Utils.log("Exception: " + exception + "\n");
-                    } 
+                    }
                 }
             };
         }
@@ -63,8 +67,8 @@ public class ControllerPanel extends javax.swing.JPanel{
         jComboBox1 = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
+        jButton3 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -104,14 +108,14 @@ public class ControllerPanel extends javax.swing.JPanel{
             }
         });
 
-        jButton3.setText("Terminate Agent");
+        jCheckBox1.setText("High Priority");
+
+        jButton3.setText("Load");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
         });
-
-        jCheckBox1.setText("High Priority");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -123,11 +127,11 @@ public class ControllerPanel extends javax.swing.JPanel{
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(2, 2, 2)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCheckBox1)
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addContainerGap(105, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -136,11 +140,9 @@ public class ControllerPanel extends javax.swing.JPanel{
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
-                    .addComponent(jCheckBox1))
-                .addGap(2, 2, 2))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addComponent(jButton3)
-                .addContainerGap())
+                    .addComponent(jCheckBox1)
+                    .addComponent(jButton3))
+                .addGap(9, 9, 9))
         );
 
         jTextArea2.setColumns(20);
@@ -159,7 +161,7 @@ public class ControllerPanel extends javax.swing.JPanel{
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -359,7 +361,7 @@ public class ControllerPanel extends javax.swing.JPanel{
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String[] commandList = jTextArea2.getText().split("\n");
-        final JSONObject commandsJSON = new JSONObject();
+        ArrayList<Command> sendList = new ArrayList<>();
         ControllerRunnable controller = null;
         boolean send = true;
         for(int i = 0; i < commandList.length; i++){
@@ -374,7 +376,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                             break;
                         }
                         else{
-                            commandsJSON.put(i, commandList[i]);
+                            Command cmd = new Command(i, commandList[i]);
+                            sendList.add(cmd);
                             break;
                         }
                     case "CCAM_COOLER_ON":
@@ -384,7 +387,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                             break;
                         }
                         else{
-                            commandsJSON.put(i, commandList[i]);
+                            Command cmd = new Command(i, commandList[i]);
+                            sendList.add(cmd);
                             break;
                         }
                     case "CCAM_LASER_ON":
@@ -394,11 +398,13 @@ public class ControllerPanel extends javax.swing.JPanel{
                             break;
                         }
                         else{
-                            commandsJSON.put(i, commandList[i]);
+                            Command cmd = new Command(i, commandList[i]);
+                            sendList.add(cmd);
                             break;
                         }
                     default:
-                        commandsJSON.put(i, commandList[i]);
+                        Command cmd = new Command(i, commandList[i]);
+                        sendList.add(cmd);
                         break;
                 }
             }
@@ -406,9 +412,14 @@ public class ControllerPanel extends javax.swing.JPanel{
                 break;
             }
         }
-        if(send && !commandsJSON.isEmpty()){
+        if(sendList.isEmpty()){
+            JOptionPane.showMessageDialog(null, "There is no command to send!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+        }
+        if(send){
+            Gson sendJSON = new Gson();
+            final String jsonString = sendJSON.toJson(sendList);
             try{
-                controller = new ControllerRunnable(9011, null){
+                controller = new ControllerRunnable(AgentPort, null){
                     @Override
                     public void run(){
                         try{
@@ -416,7 +427,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                             ObjectInputStream ois = new ObjectInputStream(getRunnableSocket().getSocket().getInputStream());
                             RoverThread.sleep(2000);
                             jTextArea1.append("Controller - Client Thread: Sending command to Agent\n");
-                            oos.writeObject(commandsJSON);
+                            oos.writeObject(jsonString);
                             RoverThread.sleep(1000);
                             ois.close();
                             oos.close(); 
@@ -429,7 +440,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                 };
             }
             catch(IOException socketException){
-                Utils.log("IOException on creating new socket: " + socketException + "\n");
+                Utils.log("Exception on creating new socket: " + socketException + "\n");
             }
             controllerConnectThread = new RoverThread(controller, "Controller Client Thread");
             controllerConnectThread.start();
@@ -437,35 +448,31 @@ public class ControllerPanel extends javax.swing.JPanel{
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        final JSONObject commandsJSON = new JSONObject();
-        ControllerRunnable controller = null;
-        commandsJSON.put("Terminate", "Shutdown");
+        BufferedReader br = null;
         try{
-            controller = new ControllerRunnable(9011, null){
-                @Override
-                public void run(){
-                    try{
-                        ObjectOutputStream oos = new ObjectOutputStream(getRunnableSocket().getSocket().getOutputStream());
-                        ObjectInputStream ois = new ObjectInputStream(getRunnableSocket().getSocket().getInputStream());
-                        jTextArea1.append("Controller: Sending command to Agent\n");
-                        oos.writeObject(commandsJSON);
-                        ois.close();
-                        oos.close(); 
-                        closeAllRunnable();
-                    }
-                    catch(IOException exception){
-                        Utils.log("Exception: " + exception + "\n");
-                    }
+            br = new BufferedReader(new FileReader(new File("src/data/commands.txt").getAbsoluteFile()));
+        }
+        catch(FileNotFoundException exception){
+            Utils.log("Exception: " + exception + "\n");
+        }
+        if(br != null){
+            String line;
+            try{
+                while((line = br.readLine()) != null){
+                    jTextArea2.append(line+"\n");
                 }
-            };
+                br.close();
+            }
+            catch(IOException exception){
+                Utils.log("Exception: " + exception + "\n");
+            }
         }
-        catch(IOException socketException){
-            Utils.log("IOException on creating new socket: " + socketException + "\n");
+        else{
+            Utils.log("Failed to read from file. Should not be here...\n");
         }
-        controllerConnectThread = new RoverThread(controller, "Controller Client Thread");
-        controllerConnectThread.start();
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
