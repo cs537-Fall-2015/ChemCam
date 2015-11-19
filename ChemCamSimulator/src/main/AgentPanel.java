@@ -54,7 +54,6 @@ public class AgentPanel extends javax.swing.JPanel{
         agentListenThread = new RoverThread(agent, "Agent Server Thread");
         executeCommands();
     }
-<<<<<<< HEAD
     private void executeCommands(){
         RoverThread agentConnectThread;
         AgentRunnable agent = null;
@@ -124,36 +123,6 @@ public class AgentPanel extends javax.swing.JPanel{
         }
         agentConnectThread = new RoverThread(agent, "Agent Client Thread #" + queue.size());
         agentConnectThread.start();
-=======
-    private void executeCommands(JSONObject commandsList) throws FileNotFoundException{
-        // TO_DO
-        JSONObject report = new JSONObject();
-        int length = commandsList.size();
-        System.out.println(length);
-        BufferedReader br = new BufferedReader(new FileReader(new File("src/data/command_data.txt").getAbsoluteFile()));
-       	String line = null;
-        
-	   
-	   
-   	 try {
-			while((line = br.readLine()) != null) {
-				jTextArea1.append(line+"\n");
-				for(int i = 1; i <= length; i++){
-					   commandsList.get(i);
-				   }
-
-			 }
-			br.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}   
-
-   	
-	   
-        
-        
->>>>>>> f38830392c139e1fbf28ae47ff397ff5fd143493
     } 
     public RoverThread getAgentListenThread(){
         return agentListenThread;
