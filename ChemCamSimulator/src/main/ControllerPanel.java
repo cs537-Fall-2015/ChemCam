@@ -4,9 +4,17 @@
 package main;
 import json.Command;
 import chemcam.*;
+
 import java.io.*;
+<<<<<<< HEAD
 import java.util.*;
 import com.google.gson.*;
+=======
+import java.util.Set;
+
+import org.json.simple.JSONObject;
+
+>>>>>>> f38830392c139e1fbf28ae47ff397ff5fd143493
 import javax.swing.JOptionPane;
 public class ControllerPanel extends javax.swing.JPanel{
     int AgentPort = 9111;
@@ -67,6 +75,11 @@ public class ControllerPanel extends javax.swing.JPanel{
         jComboBox1 = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+<<<<<<< HEAD
+=======
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+>>>>>>> f38830392c139e1fbf28ae47ff397ff5fd143493
         jCheckBox1 = new javax.swing.JCheckBox();
         jButton3 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -116,6 +129,18 @@ public class ControllerPanel extends javax.swing.JPanel{
                 jButton3ActionPerformed(evt);
             }
         });
+        
+        jButton4.setText("Upload");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try {
+					jButton4ActionPerformed(evt);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -130,6 +155,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                 .addGap(2, 2, 2)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCheckBox1)
                 .addContainerGap(105, Short.MAX_VALUE))
         );
@@ -140,9 +167,18 @@ public class ControllerPanel extends javax.swing.JPanel{
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
+<<<<<<< HEAD
                     .addComponent(jCheckBox1)
                     .addComponent(jButton3))
                 .addGap(9, 9, 9))
+=======
+                    .addComponent(jButton4)
+                    .addComponent(jCheckBox1))
+                .addGap(2, 2, 2))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(jButton3)
+                .addContainerGap())
+>>>>>>> f38830392c139e1fbf28ae47ff397ff5fd143493
         );
 
         jTextArea2.setColumns(20);
@@ -471,12 +507,34 @@ public class ControllerPanel extends javax.swing.JPanel{
             Utils.log("Failed to read from file. Should not be here...\n");
         }
     }//GEN-LAST:event_jButton3ActionPerformed
+    
+    
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) throws FileNotFoundException{
+    	BufferedReader br = new BufferedReader(new FileReader(new File("src/data/commands.txt").getAbsoluteFile()));
+    	String line = null;
+    	 try {
+			while((line = br.readLine()) != null) {
+				jTextArea2.append(line+"\n");
+				
+
+			 }
+			br.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}   
+
+    	
+    }
+    
+    
 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JDialog jDialog1;
