@@ -1,5 +1,5 @@
 /*
- * @author Loc Truong
+ * @author Niket Gosrani
  */
 package main;
 import chemcam.*;
