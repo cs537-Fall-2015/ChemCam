@@ -1,5 +1,5 @@
 /*
- * @author truol014
+ * @author Loc Truong
  */
 package chemcam;
 import java.io.*;
