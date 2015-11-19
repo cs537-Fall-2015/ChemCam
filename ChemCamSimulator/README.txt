@@ -1,1 +1,1 @@
-Compile and run main.Main or Run /dist/ChemCamSimulator.jar
+Compile and run main.Main or run /dist/ChemCamSimulator.jar
