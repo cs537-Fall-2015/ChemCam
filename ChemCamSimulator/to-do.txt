@@ -1,5 +1,0 @@
-Add save to text file (list of commands)
-
-Add load a file and execute set of commands
-
-
