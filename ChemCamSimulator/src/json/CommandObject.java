@@ -2,10 +2,10 @@
  * @author Loc Truong
  */
 package json;
-public class Command{
-    int ind;
-    String cmd;    
-    public Command(int i, String command){
+public class CommandObject{
+    private final int ind;
+    private final String cmd;    
+    public CommandObject(int i, String command){
         this.ind = i;
         this.cmd = command;        
     }
