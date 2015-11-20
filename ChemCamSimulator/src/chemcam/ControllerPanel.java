@@ -24,22 +24,23 @@ public class ControllerPanel extends javax.swing.JPanel{
                 @Override
                 public void run(){
                     try{
-                        while(true){
-                            jTextArea1.append("Controller - Server: Waiting for report.\n");
-                            getRunnableServerSocket().openSocket();
-                            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").setPrettyPrinting().create();
-                            try(ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream())){
-                                ArrayList<ReportObject> report = gson.fromJson((String)ois.readObject(), new TypeToken<ArrayList<ReportObject>>(){}.getType());
+                        jTextArea1.append("Controller - Server: Waiting for report.\n");   
+                        getRunnableServerSocket().openSocket();
+                        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").setPrettyPrinting().create();
+                        try(ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream())){
+                            while(true){
+                                String jsonString = (String)ois.readObject();
+                                ArrayList<ReportObject> report = gson.fromJson(jsonString, new TypeToken<ArrayList<ReportObject>>(){}.getType());                                
                                 if(!report.isEmpty()){
                                     jTextArea1.append("Controller - Server: Report recieved from Agent.\n");
                                     jTextArea1.append(gson.toJson(report) + "\n");
                                     jTextArea1.append("Controller - Server: Storing report to database.\n");
                                 }
-                                ois.close();
+                                Thread.sleep(3000);
                             }
                         }
                     } 
-                    catch(IOException | ClassNotFoundException exception) {
+                    catch(IOException | ClassNotFoundException | InterruptedException exception) {
                         Utils.log("Exception: " + exception + "\n");
                     }
                 }
@@ -429,6 +430,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                                 oos.writeObject(jsonString);
                                 jTextArea1.append("Controller - Client: Commands sent to Agent\n");
                                 RoverThread.sleep(1000);
+                                oos.flush();
+                                oos.close();
                             } 
                             closeAllRunnable();
                         }
@@ -438,8 +441,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                     }
                 };
             }
-            catch(IOException socketException){
-                Utils.log("Exception on creating new socket: " + socketException + "\n");
+            catch(IOException exception){
+                Utils.log("Exception: " + exception + "\n");
             }
             RoverThread controllerConnectThread = new RoverThread(controller, "Controller Client");
             controllerConnectThread.start();
@@ -455,11 +458,36 @@ public class ControllerPanel extends javax.swing.JPanel{
         }
         if(br != null){
             String line;
+            String Commands = "";
+            boolean loadsuccessful = true;
             try{
                 while((line = br.readLine()) != null){
-                    jTextArea2.append(line + "\n");
+                    if(jTextArea2.getText().contains(line)){
+                        JOptionPane.showMessageDialog(null, "Load Failed! Command Already Exists on the Command Editor.", "Load Command Error", JOptionPane.ERROR_MESSAGE);
+                        loadsuccessful = false;
+                        break;
+                    }
+                    // ugly... but hey it does the job... plus we're out of time...
+                    else if(!line.equals("CCAM_POWER_ON") && 
+                            !line.equals("CCAM_COOLER_ON") && 
+                            !line.equals("CCAM_LASER_ON") && 
+                            !line.equals("CCAM_CWL_WARM") && 
+                            !line.equals("CCAM_SET_FOCUS") && 
+                            !line.equals("CCAM_LIBS_WARM") && 
+                            !line.equals("CCAM_FIRE_LASER") && 
+                            !line.equals("CCAM_LASER_OFF") && 
+                            !line.equals("CCAM_COOLER_OFF") && 
+                            !line.equals("CCAM_POWER_OFF")){
+                        JOptionPane.showMessageDialog(null, "Load Failed! Bogus command detected... Please check \\ChemCamSimulator\\src\\chemcam\\data\\commands.txt.", "Load Command Error", JOptionPane.ERROR_MESSAGE);
+                        loadsuccessful = false;
+                        break;
+                    }
+                    Commands += line + "\n";
                 }
                 br.close();
+                if(loadsuccessful){
+                    jTextArea2.append(Commands + "\n");
+                }
             }
             catch(IOException exception){
                 Utils.log("Exception: " + exception + "\n");
