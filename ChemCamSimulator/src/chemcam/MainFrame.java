@@ -2,7 +2,6 @@
  * @author Loc Truong
  */
 package chemcam;
-
 public class MainFrame extends javax.swing.JFrame {
     private static MainFrame instance = null;
     public MainFrame(){

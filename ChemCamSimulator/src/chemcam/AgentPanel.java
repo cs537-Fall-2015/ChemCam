@@ -25,22 +25,23 @@ public class AgentPanel extends javax.swing.JPanel{
             agent = new AgentRunnable(AgentPort, queue){
                 @Override
                 public void run(){
-                    try{                        
+                    try{
+                        jTextArea1.append("Agent - Server: Waiting for command.\n");
+                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         while(true){
-                            jTextArea1.append("Agent - Server: Waiting for command.\n");
                             getRunnableServerSocket().openSocket();
-                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                            try (ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream())) {
-                                String commandsJSON = (String)ois.readObject();
-                                ArrayList<CommandObject> command = gson.fromJson(commandsJSON, new TypeToken<ArrayList<CommandObject>>(){}.getType());
+                            try(ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream())){
+                                String jsonString = (String)ois.readObject();
+                                ArrayList<CommandObject> command = gson.fromJson(jsonString, new TypeToken<ArrayList<CommandObject>>(){}.getType());
                                 if(!command.isEmpty()){                                    
                                     jTextArea1.append("Agent - Server: Commands Received from Controller.\n");
-                                    jTextArea1.append(gson.toJson(command) + "\n");
+                                    //jTextArea1.append(gson.toJson(command) + "\n");
                                     int queueNumber = queue.size();
                                     jTextArea1.append("Agent - Server: Assigned Queue Item #" + queueNumber + " to Client Thread.\n");
-                                    queue.put(new QueueItem(commandsJSON, queueNumber));
+                                    queue.put(new QueueItem(jsonString, queueNumber));                                    
                                 }
                                 ois.close();
+                                Thread.sleep(3000);
                             }
                         }                        
                     } 
@@ -50,90 +51,92 @@ public class AgentPanel extends javax.swing.JPanel{
                 }
             };
         }
-        catch(IOException socketException){
-            Utils.log("IOException on creating new socket: " + socketException + "\n");
+        catch(IOException exception){
+            Utils.log("Exception: " + exception + "\n");
         }
         RoverThread agentListenThread = new RoverThread(agent, "Agent Server");
         agentListenThread.start();
     }
     private void workerStart(){
-        AgentRunnable agent = null;
+        AgentRunnable agent = null;        
         try{
-            agent = new AgentRunnable(ControllerPort, null, queue){
+            agent = new AgentRunnable(ControllerPort, null, queue){                
                 @Override
                 public void run(){
-                    while(true){
-                        try{
-                            QueueItem qi = (QueueItem)queue.take();
-                            String commandsJSON = qi.toString();
-                            Gson gson = new Gson();
-                            ArrayList<CommandObject> recievedList = gson.fromJson(commandsJSON, new TypeToken<ArrayList<CommandObject>>(){}.getType());
-                            jTextArea1.append("Agent - Client: Starting New Tasks.\n");
-                            for(CommandObject i: recievedList){
-                                jTextArea1.append("Agent - Client: Executing Command - " + i.toString() + ".\n");
-                                switch(i.toString()){
-                                    case "CCAM_POWER_ON":
-                                        status.setStatus(Status.ON);
-                                        break;
-                                    case "CCAM_COOLER_ON":
-                                        status.setStatus(Status.CoolerON);
-                                        break;
-                                    case "CCAM_LASER_ON":
-                                        status.setStatus(Status.LaserON);
-                                        break;
-                                    case "CCAM_CWL_WARM":
-                                        status.setStatus(Status.WarmingUp);
-                                        break;
-                                    case "CCAM_LIBS_WARM":
-                                        status.setStatus(Status.WarmingUp);
-                                        break;
-                                    case "CCAM_SET_FOCUS":
-                                        status.setStatus(Status.FocusingLens);
-                                        break;
-                                    case "CCAM_FIRE_LASER":
-                                        status.setStatus(Status.FiringLaser);
-                                        Thread.sleep(5000);
-                                        status.setStatus(Status.AnalysingResults);
-                                        Thread.sleep(5000);
-                                        sendReport(this);
-                                        break;
-                                    case "CCAM_LASER_OFF":
-                                        status.setStatus(Status.CoolerOFF);
-                                        break;
-                                    case "CCAM_COOLER_OFF":
-                                        status.setStatus(Status.LaserOFF);
-                                        break;
-                                    case "CCAM_POWER_OFF":
-                                        status.setStatus(Status.OFF);
-                                        break;
-                                }
-                                //sleeping inside a thread! WOOT! =)                            
+                    try(ObjectOutputStream oos = new ObjectOutputStream(getRunnableSocket().getSocket().getOutputStream())){ 
+                        while(true){                            
+                            if(!queue.isEmpty()){
                                 try{
-                                    Thread.sleep(5000);
+                                    QueueItem qi = (QueueItem)queue.take();
+                                    String commandsJSON = qi.toString();
+                                    Gson gson = new Gson();
+                                    ArrayList<CommandObject> recievedList = gson.fromJson(commandsJSON, new TypeToken<ArrayList<CommandObject>>(){}.getType());
+                                    jTextArea1.append("Agent - Client: Starting New Tasks.\n");
+                                    for(CommandObject i: recievedList){
+                                        jTextArea1.append("Agent - Client: Executing - " + i.toString() + ".\n");
+                                        switch(i.toString()){
+                                            case "CCAM_POWER_ON":
+                                                status.setStatus(Status.ON);
+                                                break;
+                                            case "CCAM_COOLER_ON":
+                                                status.setStatus(Status.CoolerON);
+                                                break;
+                                            case "CCAM_LASER_ON":
+                                                status.setStatus(Status.LaserON);
+                                                break;
+                                            case "CCAM_CWL_WARM":
+                                                status.setStatus(Status.WarmingUp);
+                                                break;
+                                            case "CCAM_LIBS_WARM":
+                                                status.setStatus(Status.WarmingUp);
+                                                break;
+                                            case "CCAM_SET_FOCUS":
+                                                status.setStatus(Status.FocusingLens);
+                                                break;
+                                            case "CCAM_FIRE_LASER":
+                                                status.setStatus(Status.FiringLaser);
+                                                Thread.sleep(5000);
+                                                jTextArea1.append("Agent - Client: Analysing Result.\n");
+                                                status.setStatus(Status.AnalysingResults);
+                                                Thread.sleep(5000);
+                                                sendReport(oos, analyzeReport());
+                                                break;
+                                            case "CCAM_LASER_OFF":
+                                                status.setStatus(Status.CoolerOFF);
+                                                break;
+                                            case "CCAM_COOLER_OFF":
+                                                status.setStatus(Status.LaserOFF);
+                                                break;
+                                            case "CCAM_POWER_OFF":
+                                                status.setStatus(Status.OFF);
+                                                break;
+                                        }
+                                        //sleeping inside a thread! WOOT! =)                            
+                                        Thread.sleep(5000);
+                                    }
+                                    jTextArea1.append("Agent - Client: Tasks are finished for queue number " + qi.getIndex() + ".\n");
                                 }
                                 catch(InterruptedException exception){
                                     Utils.log("Exception: " + exception + "\n");
                                 }
-                            }
-                            jTextArea1.append("Agent - Client: Tasks are finished for queue number " + qi.getIndex() + ".\n");
-                        }
-                        catch(InterruptedException exception){
-                            Utils.log("Exception: " + exception + "\n");
+                            }                                
                         }
                     }
+                    catch(IOException exception){
+                        Utils.log("Exception: " + exception + "\n");
+                    }                    
                 }
             };
         }
-        catch(IOException socketException){
-            Utils.log("IOException on creating new socket: " + socketException + "\n");
+        catch(IOException exception){
+            Utils.log("Exception: " + exception + "\n");
         }
         RoverThread agentConnectThread = new RoverThread(agent, "Agent Client");
-        agentConnectThread.start();
+        agentConnectThread.start();        
     }
-    private void sendReport(AgentRunnable agent){
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").create();
+    private String analyzeReport(){
         BufferedReader br = null;                                        
-        String reportJSON = "";
+        String resultJSON = "";
         try{
             br = new BufferedReader(new FileReader(new File("src/chemcam/data/data.txt").getAbsoluteFile()));
         }
@@ -144,7 +147,7 @@ public class AgentPanel extends javax.swing.JPanel{
             String line;
             try{
                 while((line = br.readLine()) != null){
-                    reportJSON += line;
+                    resultJSON += line;
                 }
                 br.close();
             }
@@ -155,23 +158,20 @@ public class AgentPanel extends javax.swing.JPanel{
         else{
             Utils.log("Failed to read from file. Should not be here...\n");
         }
+        return resultJSON;
+    }
+    private void sendReport(ObjectOutputStream oos, String resultJSON){
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").create();        
         Random randomGenerator = new Random();
-        //jTextArea1.append("what i got from report file" + reportJSON + "\n");
-        ArrayList<ReportObject> reportList = gson.fromJson(reportJSON, new TypeToken<ArrayList<ReportObject>>(){}.getType());
-        try{
-            try(ObjectOutputStream oos = new ObjectOutputStream(agent.getRunnableSocket().getSocket().getOutputStream())){
-                RoverThread.sleep(2000);
-                jTextArea1.append("Agent - Client: Sending report to Controller\n");
-                //jTextArea1.append("what i got after parse" + reportList.toString() + "\n");
-                //jTextArea1.append("what i got for 1st item in array" + reportList.get(0).toString() + "\n");
-                oos.writeObject("[" + reportList.get(randomGenerator.nextInt(reportList.size())) + "]");
-                RoverThread.sleep(1000);
-            } 
-            agent.closeAllRunnable();
+        ArrayList<ReportObject> reportList = gson.fromJson(resultJSON, new TypeToken<ArrayList<ReportObject>>(){}.getType());
+        try{           
+            oos.writeObject("[" + reportList.get(randomGenerator.nextInt(reportList.size())) + "]");
+            oos.flush();
         }
-        catch(InterruptedException | IOException exception){
-            Utils.log("Exception: " + exception + "\n");
+        catch(IOException exception){
+            Utils.log("Agent Exception: " + exception + "\n");
         }
+        jTextArea1.append("Agent - Client: Report sent to Controller\n");        
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
