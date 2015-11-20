@@ -1,29 +1,29 @@
 /*
- * @author truol014
+ * @author Loc Truong
  */
-package chemcam;
+package chemcam.src;
 import java.io.*;
 import java.net.*;
-public abstract class AgentRunnable implements Runnable{
-    private AgentSocket runnableServerSocket;
-    private AgentSocket runnableSocket;
-    public AgentRunnable(int port) throws IOException{
+public abstract class ControllerRunnable implements Runnable{
+    private ControllerSocket runnableServerSocket;
+    private ControllerSocket runnableSocket;
+    public ControllerRunnable(int port) throws IOException{
         setRunnableServerSocket(port);
     }
-    public AgentRunnable(int port, InetAddress host) throws UnknownHostException{
+    public ControllerRunnable(int port, InetAddress host) throws UnknownHostException{
         setRunnableSocket(port, host);
     }
-    public AgentSocket getRunnableServerSocket(){
+    public ControllerSocket getRunnableServerSocket(){
         return runnableServerSocket;
     }
     private void setRunnableServerSocket(int port) throws IOException{
-        this.runnableServerSocket = new AgentSocket(port);
+        this.runnableServerSocket = new ControllerSocket(port);
     }
-    public AgentSocket getRunnableSocket(){
+    public ControllerSocket getRunnableSocket(){
         return runnableSocket;
     }
     private void setRunnableSocket(int port, InetAddress host) throws UnknownHostException{		
-        this.runnableSocket = new AgentSocket(port, host);
+        this.runnableSocket = new ControllerSocket(port, host);
     }
     public void closeAllRunnable() throws IOException{
         if(runnableServerSocket != null)

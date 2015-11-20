@@ -1,19 +1,19 @@
 /*
- * @author truol014
+ * @author Loc Truong
  */
-package chemcam;
+package chemcam.src;
 import java.io.*;
 import java.net.*;
-public final class ControllerSocket{
+public final class AgentSocket{
     private ServerSocket serverSocket;
     private Socket socket;
     private int port;
     private InetAddress host;
-    public ControllerSocket(int port) throws IOException{
+    public AgentSocket(int port) throws IOException{
         setPort(port);
         serverSocket = getServerSocket();
     }
-    public ControllerSocket(int port, InetAddress host) throws UnknownHostException{
+    public AgentSocket(int port, InetAddress host) throws UnknownHostException{
         setPort(port);
         setHost(host);
     }
@@ -71,4 +71,3 @@ public final class ControllerSocket{
             socket.close();
     }
 }
-

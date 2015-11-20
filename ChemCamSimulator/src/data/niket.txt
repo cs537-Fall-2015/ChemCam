@@ -1,2 +1,0 @@
-Command Sequence:
-CCAM_POWER_ON

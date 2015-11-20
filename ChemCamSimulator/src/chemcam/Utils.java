@@ -1,7 +1,7 @@
 /*
  * @author Loc Truong
  */
-package main;
+package chemcam;
 import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;

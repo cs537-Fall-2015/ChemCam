@@ -1,7 +1,8 @@
 /*
  * @author Loc Truong
  */
-package main;
+package chemcam;
+
 public class MainFrame extends javax.swing.JFrame {
     private static MainFrame instance = null;
     public MainFrame(){
@@ -24,30 +25,31 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        controllerPanel1 = new main.ControllerPanel();
-        agentPanel1 = new main.AgentPanel();
+        controllerPanel1 = new chemcam.ControllerPanel();
+        agentPanel1 = new chemcam.AgentPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jSplitPane1.setLeftComponent(controllerPanel1);
         jSplitPane1.setRightComponent(agentPanel1);
+        jSplitPane1.setResizeWeight(.5);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 881, Short.MAX_VALUE)
+            .addComponent(jSplitPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private static main.AgentPanel agentPanel1;
-    private static main.ControllerPanel controllerPanel1;
+    private static chemcam.AgentPanel agentPanel1;
+    private static chemcam.ControllerPanel controllerPanel1;
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 }

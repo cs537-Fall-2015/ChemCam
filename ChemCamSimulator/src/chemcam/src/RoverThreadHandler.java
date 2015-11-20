@@ -1,4 +1,4 @@
-package chemcam;
+package chemcam.src;
 public class RoverThreadHandler{
     private static RoverThreadHandler roverThreadHandler;
     private RoverThreadHandler(){
