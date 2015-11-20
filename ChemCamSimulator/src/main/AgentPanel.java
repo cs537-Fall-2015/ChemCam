@@ -2,44 +2,46 @@
  * @author Loc Truong
  */
 package main;
-import json.Command;
+import json.*;
 import chemcam.*;
 import java.io.*;
 import java.util.*;
 import com.google.gson.*;
 import com.google.gson.reflect.*;
 import java.util.concurrent.*;
-
 public class AgentPanel extends javax.swing.JPanel{
-    public RoverThread agentListenThread;
-    private int AgentPort = 9111;
-    private int ControllerPort = 9011;
-    private AgentStatus status = new AgentStatus();
-    private BlockingQueue queue = new ArrayBlockingQueue(1024);    
-    public AgentPanel(){
-        AgentRunnable agent = null;        
+    private final int AgentPort = 9111;
+    private final int ControllerPort = 9011;
+    private final AgentStatus status = new AgentStatus();
+    private final BlockingQueue queue = new ArrayBlockingQueue(1024);    
+    public AgentPanel(){     
         initComponents();
+        serverStart();
+        workerStart();
+    }
+    private void serverStart(){
+        AgentRunnable agent = null;  
         try{
             agent = new AgentRunnable(AgentPort, queue){
-                public int i = 1;
                 @Override
                 public void run(){
                     try{                        
                         while(true){
-                            jTextArea1.append("Agent - Server Thread: Waiting for command.\n");
+                            jTextArea1.append("Agent - Server: Waiting for command.\n");
                             getRunnableServerSocket().openSocket();
-                            ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream());
-                            ObjectOutputStream oos = new ObjectOutputStream(getRunnableServerSocket().getSocket().getOutputStream());
-                            String jsonString = (String)ois.readObject();
-                            if(!jsonString.isEmpty()){
-                                jTextArea1.append("Agent - Server Thread: Commands Received from Controller.\n");
-                                jTextArea1.append(jsonString + "\n");
-                                jTextArea1.append("Agent - Server Thread: Assigned to Client Thread #" + i + ".\n");                                
-                                queue.put(new QueueItem(jsonString, i));
-                            }                            
-                            ois.close();
-                            oos.close();
-                            i++;
+                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                            try (ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream())) {
+                                String commandsJSON = (String)ois.readObject();
+                                ArrayList<CommandObject> command = gson.fromJson(commandsJSON, new TypeToken<ArrayList<CommandObject>>(){}.getType());
+                                if(!command.isEmpty()){                                    
+                                    jTextArea1.append("Agent - Server: Commands Received from Controller.\n");
+                                    jTextArea1.append(gson.toJson(command) + "\n");
+                                    int queueNumber = queue.size();
+                                    jTextArea1.append("Agent - Server: Assigned Queue Item #" + queueNumber + " to Client Thread.\n");
+                                    queue.put(new QueueItem(commandsJSON, queueNumber));
+                                }
+                                ois.close();
+                            }
                         }                        
                     } 
                     catch(IOException | ClassNotFoundException | InterruptedException exception) {
@@ -51,25 +53,24 @@ public class AgentPanel extends javax.swing.JPanel{
         catch(IOException socketException){
             Utils.log("IOException on creating new socket: " + socketException + "\n");
         }
-        agentListenThread = new RoverThread(agent, "Agent Server Thread");
-        executeCommands();
+        RoverThread agentListenThread = new RoverThread(agent, "Agent Server");
+        agentListenThread.start();
     }
-    private void executeCommands(){
-        RoverThread agentConnectThread;
+    private void workerStart(){
         AgentRunnable agent = null;
         try{
             agent = new AgentRunnable(ControllerPort, null, queue){
                 @Override
                 public void run(){
-                    do{
+                    while(true){
                         try{
                             QueueItem qi = (QueueItem)queue.take();
-                            String jsonString = qi.toString();
-                            int threadNumber = qi.getIndex();
-                            Gson recievedJSON = new Gson();
-                            ArrayList<Command> recievedList = recievedJSON.fromJson(jsonString, new TypeToken<ArrayList<Command>>(){}.getType());
-                            for(Command i: recievedList){
-                                jTextArea1.append("Agent - Client Thread #" + threadNumber + ": Executing Command - " + i.toString() + ".\n");
+                            String commandsJSON = qi.toString();
+                            Gson gson = new Gson();
+                            ArrayList<CommandObject> recievedList = gson.fromJson(commandsJSON, new TypeToken<ArrayList<CommandObject>>(){}.getType());
+                            jTextArea1.append("Agent - Client: Starting New Tasks.\n");
+                            for(CommandObject i: recievedList){
+                                jTextArea1.append("Agent - Client: Executing Command - " + i.toString() + ".\n");
                                 switch(i.toString()){
                                     case "CCAM_POWER_ON":
                                         status.setStatus(Status.ON);
@@ -91,6 +92,10 @@ public class AgentPanel extends javax.swing.JPanel{
                                         break;
                                     case "CCAM_FIRE_LASER":
                                         status.setStatus(Status.FiringLaser);
+                                        Thread.sleep(5000);
+                                        status.setStatus(Status.AnalysingResults);
+                                        Thread.sleep(5000);
+                                        sendReport(this);
                                         break;
                                     case "CCAM_LASER_OFF":
                                         status.setStatus(Status.CoolerOFF);
@@ -110,22 +115,63 @@ public class AgentPanel extends javax.swing.JPanel{
                                     Utils.log("Exception: " + exception + "\n");
                                 }
                             }
+                            jTextArea1.append("Agent - Client: Tasks are finished for queue number " + qi.getIndex() + ".\n");
                         }
                         catch(InterruptedException exception){
                             Utils.log("Exception: " + exception + "\n");
                         }
-                    }while(true);
+                    }
                 }
             };
         }
         catch(IOException socketException){
             Utils.log("IOException on creating new socket: " + socketException + "\n");
         }
-        agentConnectThread = new RoverThread(agent, "Agent Client Thread #" + queue.size());
+        RoverThread agentConnectThread = new RoverThread(agent, "Agent Client");
         agentConnectThread.start();
-    } 
-    public RoverThread getAgentListenThread(){
-        return agentListenThread;
+    }
+    private void sendReport(AgentRunnable agent){
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").create();
+        BufferedReader br = null;                                        
+        String reportJSON = "";
+        try{
+            br = new BufferedReader(new FileReader(new File("src/data/data.txt").getAbsoluteFile()));
+        }
+        catch(FileNotFoundException exception){
+            Utils.log("Exception: " + exception + "\n");
+        }
+        if(br != null){
+            String line;
+            try{
+                while((line = br.readLine()) != null){
+                    reportJSON += line;
+                }
+                br.close();
+            }
+            catch(IOException exception){
+                Utils.log("Exception: " + exception + "\n");
+            }
+        }
+        else{
+            Utils.log("Failed to read from file. Should not be here...\n");
+        }
+        Random randomGenerator = new Random();
+        //jTextArea1.append("what i got from report file" + reportJSON + "\n");
+        ArrayList<ReportObject> reportList = gson.fromJson(reportJSON, new TypeToken<ArrayList<ReportObject>>(){}.getType());
+        try{
+            try(ObjectOutputStream oos = new ObjectOutputStream(agent.getRunnableSocket().getSocket().getOutputStream())){
+                RoverThread.sleep(2000);
+                jTextArea1.append("Agent - Client: Sending report to Controller\n");
+                //jTextArea1.append("what i got after parse" + reportList.toString() + "\n");
+                //jTextArea1.append("what i got for 1st item in array" + reportList.get(0).toString() + "\n");
+                oos.writeObject("[" + reportList.get(randomGenerator.nextInt(reportList.size())) + "]");
+                RoverThread.sleep(1000);
+            } 
+            agent.closeAllRunnable();
+        }
+        catch(InterruptedException | IOException exception){
+            Utils.log("Exception: " + exception + "\n");
+        }
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
