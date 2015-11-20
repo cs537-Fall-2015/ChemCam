@@ -492,6 +492,38 @@ public class ControllerPanel extends javax.swing.JPanel{
 	            Utils.log("Failed to read from file. Should not be here...\n");
 	        }
 			
+		}else{
+			JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File("src/data"));
+            if (fileChooser.showOpenDialog(jTextArea2) == JFileChooser.APPROVE_OPTION) {
+              File file = fileChooser.getSelectedFile();
+              //This is where a real application would open the file.
+              jTextArea1.append("Opening: " + file.getName());
+              try{
+  				//System.out.println("Inside n");
+  	            br = new BufferedReader(new FileReader(new File("src/data/"+file.getName()).getAbsoluteFile()));
+  	        }
+  	        catch(FileNotFoundException exception){
+  	            Utils.log("Exception: " + exception + "\n");
+  	        }
+  	        if(br != null){
+  	            String line;
+  	            try{
+  	                while((line = br.readLine()) != null){
+  	                    jTextArea2.append(line + "\n");
+  	                }
+  	                br.close();
+  	            }
+  	            catch(IOException exception){
+  	                Utils.log("Exception: " + exception + "\n");
+  	            }
+          	 
+              // save to file
+            } else{
+          	  jTextArea1.append("Save command cancelled by user.");
+            }
+            
+            }	
 		}
     
        
