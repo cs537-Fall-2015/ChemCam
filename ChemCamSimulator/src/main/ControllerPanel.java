@@ -1,11 +1,20 @@
-/*
- * @author Loc Truong
- */
+
 package main;
 import chemcam.*;
+
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.io.*;
 import org.json.simple.JSONObject;
+
+import com.sun.prism.paint.Color;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 public class ControllerPanel extends javax.swing.JPanel{
     public RoverThread controllerListenThread;
     private RoverThread controllerConnectThread;
@@ -64,6 +73,7 @@ public class ControllerPanel extends javax.swing.JPanel{
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
@@ -104,10 +114,17 @@ public class ControllerPanel extends javax.swing.JPanel{
             }
         });
 
-        jButton3.setText("Terminate Agent");
+        jButton3.setText("Load");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
+            }
+        });
+        
+        jButton4.setText("Save");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
             }
         });
 
@@ -126,6 +143,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCheckBox1)
                 .addContainerGap(43, Short.MAX_VALUE))
         );
@@ -140,6 +159,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                 .addGap(2, 2, 2))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addComponent(jButton3)
+                .addComponent(jButton4)
                 .addContainerGap())
         );
 
@@ -437,9 +457,74 @@ public class ControllerPanel extends javax.swing.JPanel{
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        BufferedReader br = null;
+        System.out.println("Hello");
+       JFrame frame = new JFrame("Load a file");
+        frame.setLayout( new GridLayout( 3,0 ) );
+        frame.setBounds(10, 30, 0, 0);
+        frame.getContentPane();
+            
+		Object[] options = { "Load Default List", "Load Custom List" };
+		int n = JOptionPane.showOptionDialog(frame, "How would you like to load the commands ", "Load a File",
+				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		System.out.println(n);
+		if(n==0){
+			try{
+				//System.out.println("Inside n");
+	            br = new BufferedReader(new FileReader(new File("src/data/commands.txt").getAbsoluteFile()));
+	        }
+	        catch(FileNotFoundException exception){
+	            Utils.log("Exception: " + exception + "\n");
+	        }
+	        if(br != null){
+	            String line;
+	            try{
+	                while((line = br.readLine()) != null){
+	                    jTextArea2.append(line + "\n");
+	                }
+	                br.close();
+	            }
+	            catch(IOException exception){
+	                Utils.log("Exception: " + exception + "\n");
+	            }
+	        }
+	        else{
+	            Utils.log("Failed to read from file. Should not be here...\n");
+	        }
+			
+		}
+    
+       
+       /* try{
+            br = new BufferedReader(new FileReader(new File("src/chemcam/data/commands.txt").getAbsoluteFile()));
+        }
+        catch(FileNotFoundException exception){
+            Utils.log("Exception: " + exception + "\n");
+        }
+        if(br != null){
+            String line;
+            try{
+                while((line = br.readLine()) != null){
+                    jTextArea2.append(line + "\n");
+                }
+                br.close();
+            }
+            catch(IOException exception){
+                Utils.log("Exception: " + exception + "\n");
+            }
+        }
+        else{
+            Utils.log("Failed to read from file. Should not be here...\n");
+        }*/
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         final JSONObject commandsJSON = new JSONObject();
+        String[] commandList = jTextArea2.getText().split("\n");
         ControllerRunnable controller = null;
-        commandsJSON.put("Terminate", "Shutdown");
+        FileWriter fw;
+        //commandsJSON.put("Save", "Saving to file..");
         try{
             controller = new ControllerRunnable(9011, null){
                 @Override
@@ -447,7 +532,27 @@ public class ControllerPanel extends javax.swing.JPanel{
                     try{
                         ObjectOutputStream oos = new ObjectOutputStream(getRunnableSocket().getSocket().getOutputStream());
                         ObjectInputStream ois = new ObjectInputStream(getRunnableSocket().getSocket().getInputStream());
-                        jTextArea1.append("Controller: Sending command to Agent\n");
+                        jTextArea1.append("Controller: Saving commands to File\n");
+                        JFileChooser fileChooser = new JFileChooser();
+                        fileChooser.setCurrentDirectory(new File("src/data"));
+                        if (fileChooser.showSaveDialog(jTextArea2) == JFileChooser.APPROVE_OPTION) {
+                          File file = fileChooser.getSelectedFile();
+                          FileWriter fw = new FileWriter(fileChooser.getSelectedFile());
+                          for(int i = 0; i < commandList.length; i++){
+                        	  fw.write(commandList[i] + "\n");
+                        	  fw.flush();
+                          }
+                         
+                      	 
+                          // save to file
+                        } else{
+                      	  jTextArea1.append("Save command cancelled by user.");
+                        }
+                        
+                        
+                			System.out.println("Successfully Copied JSON Object to File...");
+                			//System.out.println("\nJSON Object: " + commandsJSON);
+                		
                         oos.writeObject(commandsJSON);
                         ois.close();
                         oos.close(); 
@@ -457,6 +562,9 @@ public class ControllerPanel extends javax.swing.JPanel{
                         Utils.log("Exception: " + exception + "\n");
                     }
                 }
+           /*     public void cleanUp() {
+           	     writer.close();
+           	}*/
             };
         }
         catch(IOException socketException){
@@ -465,11 +573,12 @@ public class ControllerPanel extends javax.swing.JPanel{
         controllerConnectThread = new RoverThread(controller, "Controller Client Thread");
         controllerConnectThread.start();
     }//GEN-LAST:event_jButton3ActionPerformed
-
+   
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JDialog jDialog1;
