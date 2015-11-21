@@ -1,6 +1,6 @@
 1) Clone this down to your pc...
 2) If you are using Eclipse. Make sure you add the /libs/gson-2.3.1.jar to your build path. Google is your best friend, if you don't know how...
-3) Compile and run /src/chemcam/Main.main or run /dist/ChemCamSimulator.jar
+3) Compile and run /src/chemcam/Main.main or run ChemCamSimulator\dist\ChemCamSimulator.jar
 4) The GUI should be very self explanatory. There are 4 buttons:
   a) Clear button is to clear command editor.
   b) Send button is to send commands, after you are done editting them.
