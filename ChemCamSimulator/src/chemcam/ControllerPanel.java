@@ -363,9 +363,6 @@ public class ControllerPanel extends javax.swing.JPanel{
                     break;
             }
         }
-        else{
-            // To do
-        }
     }//GEN-LAST:event_jComboBox1ActionPerformed
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String[] commandList = jTextArea2.getText().split("\n");
@@ -373,13 +370,29 @@ public class ControllerPanel extends javax.swing.JPanel{
         ControllerRunnable controller = null;
         boolean send = true;
         for(int i = 0; i < commandList.length; i++){
-            if(send){
+            // it's ugly... I know... but hey it does the job... and we're out of time...
+            if(!commandList[i].equals("Command Sequence:") && 
+                    !commandList[i].equals("CCAM_POWER_ON") &&
+                    !commandList[i].equals("CCAM_COOLER_ON") && 
+                    !commandList[i].equals("CCAM_LASER_ON") && 
+                    !commandList[i].equals("CCAM_CWL_WARM") && 
+                    !commandList[i].equals("CCAM_SET_FOCUS") && 
+                    !commandList[i].equals("CCAM_LIBS_WARM") && 
+                    !commandList[i].equals("CCAM_FIRE_LASER") && 
+                    !commandList[i].equals("CCAM_LASER_OFF") && 
+                    !commandList[i].equals("CCAM_COOLER_OFF") && 
+                    !commandList[i].equals("CCAM_POWER_OFF")){
+                JOptionPane.showMessageDialog(null, "Send Failed! Please make sure commands are valid.", "Send Command Error", JOptionPane.ERROR_MESSAGE);
+                send = false;
+                break;
+            }
+            else if(send){
                 switch(commandList[i]){
                     case "Command Sequence:":
                         break;
                     case "CCAM_POWER_ON":
                         if(!jTextArea2.getText().contains("CCAM_POWER_OFF")){
-                            JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not going to be turned OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Chemical Camera's Power is not going to be turned OFF!", "Send Command Error", JOptionPane.ERROR_MESSAGE);
                             send = false;
                             break;
                         }
@@ -390,7 +403,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                         }
                     case "CCAM_COOLER_ON":
                         if(!jTextArea2.getText().contains("CCAM_COOLER_OFF")){
-                            JOptionPane.showMessageDialog(null, "Chemical Camera's Cooler is not going to be turned OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Chemical Camera's Cooler is not going to be turned OFF!", "Send Command Error", JOptionPane.ERROR_MESSAGE);
                             send = false;
                             break;
                         }
@@ -401,7 +414,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                         }
                     case "CCAM_LASER_ON":
                         if(!jTextArea2.getText().contains("CCAM_LASER_OFF")){
-                            JOptionPane.showMessageDialog(null, "Chemical Camera's Laser is not going to be turned OFF!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Chemical Camera's Laser is not going to be turned OFF!", "Send Command Error", JOptionPane.ERROR_MESSAGE);
                             send = false;
                             break;
                         }
@@ -421,7 +434,8 @@ public class ControllerPanel extends javax.swing.JPanel{
             }
         }
         if(sendList.isEmpty()){
-            JOptionPane.showMessageDialog(null, "There is no command to send!", "Add Command Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "There is no command to send!", "Send Command Error", JOptionPane.ERROR_MESSAGE);
+            send = false;
         }
         if(send){
             Gson sendJSON = new Gson();
@@ -472,6 +486,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                         success = false;
                         break;
                     }
+                    // it's ugly... I know... but hey it does the job... and we're out of time...
                     else if(!line.equals("CCAM_POWER_ON") && 
                             !line.equals("CCAM_COOLER_ON") && 
                             !line.equals("CCAM_LASER_ON") && 
@@ -517,8 +532,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                     fw.flush();
                 }
             }
-            catch(IOException ex){
-                Logger.getLogger(ControllerPanel.class.getName()).log(Level.SEVERE, null, ex);
+            catch(IOException exception){
+                Utils.log("Exception: " + exception + "\n");
             }
             
         }
