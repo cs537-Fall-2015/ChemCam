@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.*;
 import com.google.gson.*;
 import com.google.gson.reflect.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 public class ControllerPanel extends javax.swing.JPanel{
     private final int AgentPort = 9111;
@@ -24,18 +26,17 @@ public class ControllerPanel extends javax.swing.JPanel{
                 @Override
                 public void run(){
                     try{
-                        while(true){
-                            jTextArea1.append("Controller - Server: Waiting for report.\n");
-                            getRunnableServerSocket().openSocket();
-                            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").setPrettyPrinting().create();
-                            try(ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream())){
+                        jTextArea1.append("Controller - Server: Waiting for report.\n");
+                        getRunnableServerSocket().openSocket();
+                        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").setPrettyPrinting().create();
+                        try(ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream())){
+                            while(true){
                                 ArrayList<ReportObject> report = gson.fromJson((String)ois.readObject(), new TypeToken<ArrayList<ReportObject>>(){}.getType());
                                 if(!report.isEmpty()){
                                     jTextArea1.append("Controller - Server: Report recieved from Agent.\n");
                                     jTextArea1.append(gson.toJson(report) + "\n");
                                     jTextArea1.append("Controller - Server: Storing report to database.\n");
                                 }
-                                ois.close();
                             }
                         }
                     } 
@@ -67,8 +68,8 @@ public class ControllerPanel extends javax.swing.JPanel{
         jComboBox1 = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jCheckBox1 = new javax.swing.JCheckBox();
         jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -108,12 +109,17 @@ public class ControllerPanel extends javax.swing.JPanel{
             }
         });
 
-        jCheckBox1.setText("High Priority");
-
         jButton3.setText("Load");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("Save");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
             }
         });
 
@@ -127,10 +133,11 @@ public class ControllerPanel extends javax.swing.JPanel{
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
-                .addGap(2, 2, 2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox1))
+                .addComponent(jButton4)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -139,8 +146,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
-                    .addComponent(jCheckBox1)
-                    .addComponent(jButton3))
+                    .addComponent(jButton3)
+                    .addComponent(jButton4))
                 .addGap(9, 9, 9))
         );
 
@@ -429,6 +436,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                                 oos.writeObject(jsonString);
                                 jTextArea1.append("Controller - Client: Commands sent to Agent\n");
                                 RoverThread.sleep(1000);
+                                oos.close();
                             } 
                             closeAllRunnable();
                         }
@@ -447,6 +455,7 @@ public class ControllerPanel extends javax.swing.JPanel{
     }//GEN-LAST:event_jButton2ActionPerformed
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         BufferedReader br = null;
+        boolean success = true;
         try{
             br = new BufferedReader(new FileReader(new File("src/chemcam/data/commands.txt").getAbsoluteFile()));
         }
@@ -455,11 +464,34 @@ public class ControllerPanel extends javax.swing.JPanel{
         }
         if(br != null){
             String line;
+            String commands = "";            
             try{
                 while((line = br.readLine()) != null){
-                    jTextArea2.append(line + "\n");
+                    if(jTextArea2.getText().contains(line)){
+                        JOptionPane.showMessageDialog(null, "Command Already Exists on Command Editor!", "Load Command Error", JOptionPane.ERROR_MESSAGE);
+                        success = false;
+                        break;
+                    }
+                    else if(!line.equals("CCAM_POWER_ON") && 
+                            !line.equals("CCAM_COOLER_ON") && 
+                            !line.equals("CCAM_LASER_ON") && 
+                            !line.equals("CCAM_CWL_WARM") && 
+                            !line.equals("CCAM_SET_FOCUS") && 
+                            !line.equals("CCAM_LIBS_WARM") && 
+                            !line.equals("CCAM_FIRE_LASER") && 
+                            !line.equals("CCAM_LASER_OFF") && 
+                            !line.equals("CCAM_COOLER_OFF") && 
+                            !line.equals("CCAM_POWER_OFF")){
+                        JOptionPane.showMessageDialog(null, "Load Failed! Please check the content of \\ChemCamSimulator\\src\\chemcam\\data\\commands.txt", "Load Command Error", JOptionPane.ERROR_MESSAGE);
+                        success = false;
+                        break;
+                    }
+                    commands += line + "\n";
                 }
                 br.close();
+                if(success){
+                    jTextArea2.append(commands);
+                }
             }
             catch(IOException exception){
                 Utils.log("Exception: " + exception + "\n");
@@ -469,11 +501,34 @@ public class ControllerPanel extends javax.swing.JPanel{
             Utils.log("Failed to read from file. Should not be here...\n");
         }
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        FileWriter fw;
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File("src/chemcam/data"));
+        String[] commandList = jTextArea2.getText().split("\n");
+        if(fileChooser.showSaveDialog(jTextArea2) == JFileChooser.APPROVE_OPTION){
+            try{
+                fw = new FileWriter(fileChooser.getSelectedFile());
+                for(String command : commandList){
+                    if(!command.equalsIgnoreCase("Command Sequence:")){
+                        fw.write(command + "\n");
+                    }                    
+                    fw.flush();
+                }
+            }
+            catch(IOException ex){
+                Logger.getLogger(ControllerPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JButton jButton4;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JPanel jPanel1;

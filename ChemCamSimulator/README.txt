@@ -1,1 +1,12 @@
-Compile and run main.Main or run /dist/ChemCamSimulator.jar
+1) Clone this down to your pc...
+2) If you are using Eclipse. Make sure you add the /libs/gson-2.3.1.jar to your build path. Google is your best friend, if you don't know how...
+3) Compile and run /src/chemcam/Main.main or run ChemCamSimulator\dist\ChemCamSimulator.jar
+4) The GUI should be very self explanatory. There are 4 buttons:
+  a) Clear button is to clear command editor.
+  b) Send button is to send commands, after you are done editting them.
+  c) Load is to load predetermined text file. The file should be here <wherever-you-cloned>\ChemCamSimulator\src\chemcam\data\commands.txt
+  d) Save button is to save the commands, that you have editted to any where you want. 
+   There are of course checks in place to make sure you are not sending bogus command or incomplete commands list to the agent.
+5) There's also a drop down menu for you to select predetermined commands. Checks are also in place for this functionality.
+6) Last thing, please don't mess with <wherever-you-cloned>\ChemCamSimulator\src\chemcam\data\data.txt. That's the dummy data file that the program needs...
+7) Report any bug you find to the next unlucky group that comes along...
