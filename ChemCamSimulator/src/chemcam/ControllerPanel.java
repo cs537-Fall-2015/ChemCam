@@ -1,9 +1,9 @@
-/*
- * @author Loc Truong
- */
+
 package chemcam;
 import chemcam.json.*;
 import chemcam.src.*;
+
+import java.awt.GridLayout;
 import java.io.*;
 import java.util.*;
 import com.google.gson.*;
@@ -467,10 +467,79 @@ public class ControllerPanel extends javax.swing.JPanel{
             controllerConnectThread.start();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+    
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         BufferedReader br = null;
-        boolean success = true;
-        try{
+        System.out.println("Hello");
+       JFrame frame = new JFrame("Load a file");
+        frame.setLayout( new GridLayout( 3,0 ) );
+        frame.setBounds(10, 30, 0, 0);
+        frame.getContentPane();
+            
+		Object[] options = { "Load Default List", "Load Custom List" };
+		int n = JOptionPane.showOptionDialog(frame, "How would you like to load the commands ", "Load a File",
+				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		System.out.println(n);
+		if(n==0){
+			try{
+				//System.out.println("Inside n");
+	            br = new BufferedReader(new FileReader(new File("src/chemcam/data/commands.txt").getAbsoluteFile()));
+	        }
+	        catch(FileNotFoundException exception){
+	            Utils.log("Exception: " + exception + "\n");
+	        }
+	        if(br != null){
+	            String line;
+	            try{
+	                while((line = br.readLine()) != null){
+	                    jTextArea2.append(line + "\n");
+	                }
+	                br.close();
+	            }
+	            catch(IOException exception){
+	                Utils.log("Exception: " + exception + "\n");
+	            }
+	        }
+	        else{
+	            Utils.log("Failed to read from file. Should not be here...\n");
+	        }
+			
+		}else{
+			JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File("src/chemcam/data"));
+            if (fileChooser.showOpenDialog(jTextArea2) == JFileChooser.APPROVE_OPTION) {
+              File file = fileChooser.getSelectedFile();
+              //This is where a real application would open the file.
+              jTextArea1.append("Opening: " + file.getName());
+              try{
+  				//System.out.println("Inside n");
+  	            br = new BufferedReader(new FileReader(new File("src/chemcam/data/"+file.getName()).getAbsoluteFile()));
+  	        }
+  	        catch(FileNotFoundException exception){
+  	            Utils.log("Exception: " + exception + "\n");
+  	        }
+  	        if(br != null){
+  	            String line;
+  	            try{
+  	                while((line = br.readLine()) != null){
+  	                    jTextArea2.append(line + "\n");
+  	                }
+  	                br.close();
+  	            }
+  	            catch(IOException exception){
+  	                Utils.log("Exception: " + exception + "\n");
+  	            }
+          	 
+              // save to file
+            } else{
+          	  jTextArea1.append("Save command cancelled by user.");
+            }
+            
+            }	
+		}
+    
+       
+       /* try{
             br = new BufferedReader(new FileReader(new File("src/chemcam/data/commands.txt").getAbsoluteFile()));
         }
         catch(FileNotFoundException exception){
@@ -478,35 +547,11 @@ public class ControllerPanel extends javax.swing.JPanel{
         }
         if(br != null){
             String line;
-            String commands = "";            
             try{
                 while((line = br.readLine()) != null){
-                    if(jTextArea2.getText().contains(line)){
-                        JOptionPane.showMessageDialog(null, "Command Already Exists on Command Editor!", "Load Command Error", JOptionPane.ERROR_MESSAGE);
-                        success = false;
-                        break;
-                    }
-                    // it's ugly... I know... but hey it does the job... and we're out of time...
-                    else if(!line.equals("CCAM_POWER_ON") && 
-                            !line.equals("CCAM_COOLER_ON") && 
-                            !line.equals("CCAM_LASER_ON") && 
-                            !line.equals("CCAM_CWL_WARM") && 
-                            !line.equals("CCAM_SET_FOCUS") && 
-                            !line.equals("CCAM_LIBS_WARM") && 
-                            !line.equals("CCAM_FIRE_LASER") && 
-                            !line.equals("CCAM_LASER_OFF") && 
-                            !line.equals("CCAM_COOLER_OFF") && 
-                            !line.equals("CCAM_POWER_OFF")){
-                        JOptionPane.showMessageDialog(null, "Load Failed! Please check the content of \\ChemCamSimulator\\src\\chemcam\\data\\commands.txt", "Load Command Error", JOptionPane.ERROR_MESSAGE);
-                        success = false;
-                        break;
-                    }
-                    commands += line + "\n";
+                    jTextArea2.append(line + "\n");
                 }
                 br.close();
-                if(success){
-                    jTextArea2.append(commands);
-                }
             }
             catch(IOException exception){
                 Utils.log("Exception: " + exception + "\n");
@@ -514,7 +559,7 @@ public class ControllerPanel extends javax.swing.JPanel{
         }
         else{
             Utils.log("Failed to read from file. Should not be here...\n");
-        }
+        }*/
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
