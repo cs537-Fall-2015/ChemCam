@@ -1,6 +1,4 @@
-/*
- * @author Loc Truong
- */
+
 package chemcam;
 import chemcam.json.*;
 import chemcam.src.*;

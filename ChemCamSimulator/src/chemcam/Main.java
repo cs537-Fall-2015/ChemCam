@@ -1,6 +1,4 @@
-/*
- * @author Loc Truong
- */
+
 package chemcam;
 import javax.swing.*;
 public class Main {
