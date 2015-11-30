@@ -1,4 +1,6 @@
-
+/*
+ * @author Loc Truong
+ */
 package chemcam;
 import javax.swing.*;
 public class Main {
@@ -17,6 +19,7 @@ public class Main {
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
+                frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
             }
         });
     }

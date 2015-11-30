@@ -1,3 +1,6 @@
+/*
+ * @author Loc Truong
+ */
 package chemcam.src;
 public class QueueItem{
     String jsonString;

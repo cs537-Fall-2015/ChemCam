@@ -1,4 +1,6 @@
-
+/*
+ * @author Loc Truong
+ */
 package chemcam;
 import chemcam.json.*;
 import chemcam.src.*;
@@ -8,9 +10,11 @@ import java.io.*;
 import java.util.*;
 import com.google.gson.*;
 import com.google.gson.reflect.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.image.*;
+import java.beans.PropertyVetoException;
+import javax.imageio.*;
 import javax.swing.*;
+import javax.xml.bind.DatatypeConverter;
 public class ControllerPanel extends javax.swing.JPanel{
     private final int AgentPort = 9111;
     private final int ControllerPort = 9011;
@@ -26,16 +30,21 @@ public class ControllerPanel extends javax.swing.JPanel{
                 @Override
                 public void run(){
                     try{
-                        jTextArea1.append("Controller - Server: Waiting for report.\n");
+                        jTextArea1.append("Server: Waiting for report.\n");
                         getRunnableServerSocket().openSocket();
                         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").setPrettyPrinting().create();
                         try(ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream())){
                             while(true){
                                 ArrayList<ReportObject> report = gson.fromJson((String)ois.readObject(), new TypeToken<ArrayList<ReportObject>>(){}.getType());
                                 if(!report.isEmpty()){
-                                    jTextArea1.append("Controller - Server: Report recieved from Agent.\n");
-                                    jTextArea1.append(gson.toJson(report) + "\n");
-                                    jTextArea1.append("Controller - Server: Storing report to database.\n");
+                                    jTextArea1.append("Server: Report recieved from Agent.\n");
+                                    jTextArea1.append("Server: Storing report to database.\n");
+                                    try(FileWriter writer = new FileWriter("src/chemcam/data/ControllerData/reportData.txt")){
+                                        writer.write(gson.toJson(report));
+                                    }
+                                    catch(IOException exception){
+                                        Utils.log("Exception: " + exception + "\n");
+                                    }
                                 }
                             }
                         }
@@ -61,7 +70,9 @@ public class ControllerPanel extends javax.swing.JPanel{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jDialog1 = new javax.swing.JDialog();
+        panel1 = new javax.swing.JPanel();
+        panel2 = new javax.swing.JPanel();
+        combo = new javax.swing.JComboBox();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -70,24 +81,47 @@ public class ControllerPanel extends javax.swing.JPanel{
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        jButton5 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel1 = jLabel1 = new JLabel("Controller Console", SwingConstants.CENTER);
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
 
-        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
-        jDialog1.getContentPane().setLayout(jDialog1Layout);
-        jDialog1Layout.setHorizontalGroup(
-            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
+        panel1.setLayout(panel1Layout);
+        panel1Layout.setHorizontalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 120, Short.MAX_VALUE)
         );
-        jDialog1Layout.setVerticalGroup(
-            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        panel1Layout.setVerticalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        combo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        javax.swing.GroupLayout panel2Layout = new javax.swing.GroupLayout(panel2);
+        panel2.setLayout(panel2Layout);
+        panel2Layout.setHorizontalGroup(
+            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel2Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(combo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+        panel2Layout.setVerticalGroup(
+            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel2Layout.createSequentialGroup()
+                .addGap(40, 40, 40)
+                .addComponent(combo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(40, Short.MAX_VALUE))
         );
 
         jSplitPane1.setDividerSize(2);
 
+        jComboBox1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select A Command", "CCAM_POWER_ON", "CCAM_COOLER_ON", "CCAM_LASER_ON", "CCAM_CWL_WARM", "CCAM_SET_FOCUS", "CCAM_LIBS_WARM", "CCAM_FIRE_LASER", "CCAM_LASER_OFF", "CCAM_COOLER_OFF", "CCAM_POWER_OFF" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -95,31 +129,43 @@ public class ControllerPanel extends javax.swing.JPanel{
             }
         });
 
-        jButton1.setText("Clear");
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chemcam/img/trash.png"))); // NOI18N
+        jButton1.setToolTipText("Clear Commands");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Send");
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chemcam/img/rocket.png"))); // NOI18N
+        jButton2.setToolTipText("Send Commands");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Load");
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chemcam/img/folder.png"))); // NOI18N
+        jButton3.setToolTipText("Load Commands");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
         });
 
-        jButton4.setText("Save");
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chemcam/img/save.png"))); // NOI18N
+        jButton4.setToolTipText("Save Commands");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
+            }
+        });
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chemcam/img/View_Details.png"))); // NOI18N
+        jButton5.setToolTipText("Browse Reports");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
             }
         });
 
@@ -132,11 +178,13 @@ public class ControllerPanel extends javax.swing.JPanel{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton5)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -147,13 +195,14 @@ public class ControllerPanel extends javax.swing.JPanel{
                     .addComponent(jButton1)
                     .addComponent(jButton2)
                     .addComponent(jButton3)
-                    .addComponent(jButton4))
+                    .addComponent(jButton4)
+                    .addComponent(jButton5))
                 .addGap(9, 9, 9))
         );
 
         jTextArea2.setColumns(20);
         jTextArea2.setRows(5);
-        jScrollPane3.setViewportView(jTextArea2);
+        jScrollPane2.setViewportView(jTextArea2);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -161,7 +210,7 @@ public class ControllerPanel extends javax.swing.JPanel{
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
@@ -170,10 +219,13 @@ public class ControllerPanel extends javax.swing.JPanel{
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jLabel1.setText("Controller Console");
 
         jTextArea1.setBackground(new java.awt.Color(0, 0, 0));
         jTextArea1.setColumns(20);
@@ -181,17 +233,33 @@ public class ControllerPanel extends javax.swing.JPanel{
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        jSplitPane1.setRightComponent(jScrollPane1);
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                .addGap(1, 1, 1))
+        );
+
+        jSplitPane1.setRightComponent(jPanel3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
     }// </editor-fold>//GEN-END:initComponents
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -448,7 +516,7 @@ public class ControllerPanel extends javax.swing.JPanel{
                             try(ObjectOutputStream oos = new ObjectOutputStream(getRunnableSocket().getSocket().getOutputStream())){
                                 RoverThread.sleep(2000);                                
                                 oos.writeObject(jsonString);
-                                jTextArea1.append("Controller - Client: Commands sent to Agent\n");
+                                jTextArea1.append("Client: Commands sent to Agent\n");
                                 RoverThread.sleep(1000);
                                 oos.close();
                             } 
@@ -470,50 +538,70 @@ public class ControllerPanel extends javax.swing.JPanel{
     
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         BufferedReader br = null;
-        System.out.println("Hello");
-       JFrame frame = new JFrame("Load a file");
+        boolean success = true;
+        JFrame frame = new JFrame("Load a file");
         frame.setLayout( new GridLayout( 3,0 ) );
         frame.setBounds(10, 30, 0, 0);
-        frame.getContentPane();
-            
-		Object[] options = { "Load Default List", "Load Custom List" };
-		int n = JOptionPane.showOptionDialog(frame, "How would you like to load the commands ", "Load a File",
-				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-		System.out.println(n);
-		if(n==0){
-			try{
-				//System.out.println("Inside n");
-	            br = new BufferedReader(new FileReader(new File("src/chemcam/data/commands.txt").getAbsoluteFile()));
-	        }
-	        catch(FileNotFoundException exception){
-	            Utils.log("Exception: " + exception + "\n");
-	        }
-	        if(br != null){
-	            String line;
-	            try{
-	                while((line = br.readLine()) != null){
-	                    jTextArea2.append(line + "\n");
-	                }
-	                br.close();
-	            }
-	            catch(IOException exception){
-	                Utils.log("Exception: " + exception + "\n");
-	            }
+        frame.getContentPane();            
+        Object[] options = { "Load Default List", "Load Custom List" };
+	int n = JOptionPane.showOptionDialog(frame, "How would you like to load the commands ", "Load a File", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        if(n == 0){
+                try{
+                    br = new BufferedReader(new FileReader(new File("src/chemcam/data/ControllerData/commands.txt").getAbsoluteFile()));
+                }
+                catch(FileNotFoundException exception){
+                    Utils.log("Exception: " + exception + "\n");
+                }
+                if(br != null){
+                    String line;
+                    String commands = "";
+                    try{
+                        while((line = br.readLine()) != null){
+                            if(jTextArea2.getText().contains(line)){
+                                JOptionPane.showMessageDialog(null, "Command Already Exists on Command Editor!", "Load Command Error", JOptionPane.ERROR_MESSAGE);
+                                success = false;
+                                break;
+                            }
+                            // it's ugly... I know... but hey it does the job... and we're out of time...
+                            else if(!line.equals("CCAM_POWER_ON") && 
+                                    !line.equals("CCAM_COOLER_ON") && 
+                                    !line.equals("CCAM_LASER_ON") && 
+                                    !line.equals("CCAM_CWL_WARM") && 
+                                    !line.equals("CCAM_SET_FOCUS") && 
+                                    !line.equals("CCAM_LIBS_WARM") && 
+                                    !line.equals("CCAM_FIRE_LASER") && 
+                                    !line.equals("CCAM_LASER_OFF") && 
+                                    !line.equals("CCAM_COOLER_OFF") && 
+                                    !line.equals("CCAM_POWER_OFF")){
+                                JOptionPane.showMessageDialog(null, "Load Failed! Please check the content of src/chemcam/data/ControllerData/commands.txt", "Load Command Error", JOptionPane.ERROR_MESSAGE);
+                                success = false;
+                                break;
+                            }
+                            commands += line + "\n";
+                        }
+                        br.close();
+                        if(success){
+                            jTextArea2.append(commands);
+                        }
+                    }
+                    catch(IOException exception){
+                        Utils.log("Exception: " + exception + "\n");
+                    }
 	        }
 	        else{
 	            Utils.log("Failed to read from file. Should not be here...\n");
 	        }
-			
-		}else{
-			JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(new File("src/chemcam/data"));
-            if (fileChooser.showOpenDialog(jTextArea2) == JFileChooser.APPROVE_OPTION) {
-              File file = fileChooser.getSelectedFile();
-              //This is where a real application would open the file.
-              jTextArea1.append("Opening: " + file.getName());
-              try{
-  				//System.out.println("Inside n");
-  	            br = new BufferedReader(new FileReader(new File("src/chemcam/data/"+file.getName()).getAbsoluteFile()));
+        }
+        else{
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File("src/chemcam/dataControllerData/"));
+            if (fileChooser.showOpenDialog(jTextArea2) == JFileChooser.APPROVE_OPTION){
+                File file = fileChooser.getSelectedFile();
+                //This is where a real application would open the file.
+                jTextArea1.append("Opening: " + file.getName());
+                try{
+                    //System.out.println("Inside n");
+                    br = new BufferedReader(new FileReader(new File("src/chemcam/data/ControllerData/"+file.getName()).getAbsoluteFile()));
   	        }
   	        catch(FileNotFoundException exception){
   	            Utils.log("Exception: " + exception + "\n");
@@ -529,43 +617,15 @@ public class ControllerPanel extends javax.swing.JPanel{
   	            catch(IOException exception){
   	                Utils.log("Exception: " + exception + "\n");
   	            }
-          	 
-              // save to file
-            } else{
-          	  jTextArea1.append("Save command cancelled by user.");
-            }
-            
-            }	
-		}
-    
-       
-       /* try{
-            br = new BufferedReader(new FileReader(new File("src/chemcam/data/commands.txt").getAbsoluteFile()));
-        }
-        catch(FileNotFoundException exception){
-            Utils.log("Exception: " + exception + "\n");
-        }
-        if(br != null){
-            String line;
-            try{
-                while((line = br.readLine()) != null){
-                    jTextArea2.append(line + "\n");
                 }
-                br.close();
-            }
-            catch(IOException exception){
-                Utils.log("Exception: " + exception + "\n");
             }
         }
-        else{
-            Utils.log("Failed to read from file. Should not be here...\n");
-        }*/
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         FileWriter fw;
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File("src/chemcam/data"));
+        fileChooser.setCurrentDirectory(new File("src/chemcam/data/ControllerData"));
         String[] commandList = jTextArea2.getText().split("\n");
         if(fileChooser.showSaveDialog(jTextArea2) == JFileChooser.APPROVE_OPTION){
             try{
@@ -579,24 +639,91 @@ public class ControllerPanel extends javax.swing.JPanel{
             }
             catch(IOException exception){
                 Utils.log("Exception: " + exception + "\n");
-            }
-            
+            }            
         }
     }//GEN-LAST:event_jButton4ActionPerformed
-
+    
+    @SuppressWarnings("unchecked")
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").setPrettyPrinting().create();
+        String reportListJSON = "";
+        try{
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File("src/chemcam/data/ControllerData/reportData.txt").getAbsoluteFile()))) {
+                String line;                
+                while((line = bufferedReader.readLine()) != null){
+                    reportListJSON += line;
+                }
+            }  
+        }
+        catch(IOException exception){
+            Utils.log("Exception: " + exception + "\n");
+        }
+        final ArrayList<ReportObject> reportList = gson.fromJson(reportListJSON, new TypeToken<ArrayList<ReportObject>>(){}.getType());
+        byte[] imageInByte = DatatypeConverter.parseBase64Binary((reportList.get(0).getIMAGE_ENCODED()));
+        InputStream in = new ByteArrayInputStream(imageInByte);
+        BufferedImage bufferedImage = null;
+        try{
+            bufferedImage = ImageIO.read(in);
+        }
+        catch(IOException exception) {
+            Utils.log("Exception: " + exception + "\n");
+        }
+        ImageIcon icon = new ImageIcon(bufferedImage);
+        final JTextField field1 = new JTextField(reportList.get(0).getRECORD_TYPE(), 50);
+        final JTextField field2 = new JTextField(reportList.get(0).getDATA_SET_NAME(), 50);
+        final JLabel picLabel = new JLabel(icon);
+        combo = new JComboBox();
+        panel1 = new JPanel();
+        panel2 = new JPanel(new GridLayout(0, 1));
+        for(ReportObject report: reportList){
+            combo.addItem(report.getPRODUCT_CREATION_TIME());
+        }
+        panel2.add(combo);
+        panel2.add(new JLabel("RECORD_TYPE:"));
+        panel2.add(field1);
+        panel2.add(new JLabel("DATA_SET_NAME:"));
+        panel2.add(field2);
+        panel1.add(panel2);
+        panel1.add(picLabel);
+        combo.addActionListener(new java.awt.event.ActionListener(){
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt){
+                field1.setText((reportList.get(combo.getSelectedIndex()).getRECORD_TYPE()));
+                field2.setText((reportList.get(combo.getSelectedIndex()).getDATA_SET_NAME()));
+                byte[] imageInByte = DatatypeConverter.parseBase64Binary((reportList.get(combo.getSelectedIndex()).getIMAGE_ENCODED()));
+                InputStream in = new ByteArrayInputStream(imageInByte);
+                BufferedImage bufferedImage = null;
+                try{
+                    bufferedImage = ImageIO.read(in);
+                }
+                catch(IOException exception) {
+                    Utils.log("Exception: " + exception + "\n");
+                }
+                ImageIcon icon = new ImageIcon(bufferedImage);
+                picLabel.setIcon(icon);
+            }
+        });
+        JOptionPane.showConfirmDialog(null, panel1, "Browse Report", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+    }//GEN-LAST:event_jButton5ActionPerformed
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox combo;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JDialog jDialog1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
+    private javax.swing.JPanel panel1;
+    private javax.swing.JPanel panel2;
     // End of variables declaration//GEN-END:variables
 }

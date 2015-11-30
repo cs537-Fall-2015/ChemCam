@@ -32,6 +32,10 @@ public class MainFrame extends javax.swing.JFrame {
         jSplitPane1.setLeftComponent(controllerPanel1);
         jSplitPane1.setRightComponent(agentPanel1);
         jSplitPane1.setResizeWeight(.5);
+        
+        jSplitPane1.setDoubleBuffered(true);
+        controllerPanel1.setDoubleBuffered(true);
+        agentPanel1.setDoubleBuffered(true);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
