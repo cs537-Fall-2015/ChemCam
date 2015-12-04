@@ -16,4 +16,7 @@ public class CommandObject{
     public String toString(){
         return String.format("%s", cmd);
     }
+    public boolean isAbort(){
+        return cmd.equals("ABORT");
+    }
 }

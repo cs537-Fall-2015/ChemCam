@@ -11,7 +11,6 @@ import java.util.*;
 import com.google.gson.*;
 import com.google.gson.reflect.*;
 import java.awt.image.*;
-import java.beans.PropertyVetoException;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.xml.bind.DatatypeConverter;
@@ -82,6 +81,7 @@ public class ControllerPanel extends javax.swing.JPanel{
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
@@ -169,6 +169,14 @@ public class ControllerPanel extends javax.swing.JPanel{
             }
         });
 
+        jButton6.setIcon(new javax.swing.ImageIcon("C:\\Users\\truol014\\Desktop\\Classes\\ChemCam\\ChemCamSimulator\\src\\chemcam\\img\\hand_cursor.png")); // NOI18N
+        jButton6.setToolTipText("Abort Commands");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -185,11 +193,14 @@ public class ControllerPanel extends javax.swing.JPanel{
                 .addComponent(jButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton5)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton6)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
@@ -197,7 +208,10 @@ public class ControllerPanel extends javax.swing.JPanel{
                     .addComponent(jButton3)
                     .addComponent(jButton4)
                     .addComponent(jButton5))
-                .addGap(9, 9, 9))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTextArea2.setColumns(20);
@@ -211,15 +225,15 @@ public class ControllerPanel extends javax.swing.JPanel{
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE))
+                .addComponent(jScrollPane2))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -237,15 +251,15 @@ public class ControllerPanel extends javax.swing.JPanel{
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
                 .addGap(1, 1, 1))
         );
 
@@ -506,8 +520,8 @@ public class ControllerPanel extends javax.swing.JPanel{
             send = false;
         }
         if(send){
-            Gson sendJSON = new Gson();
-            final String jsonString = sendJSON.toJson(sendList);
+            Gson gson = new Gson();
+            final String jsonString = gson.toJson(sendList);
             try{
                 controller = new ControllerRunnable(AgentPort, null){
                     @Override
@@ -528,8 +542,8 @@ public class ControllerPanel extends javax.swing.JPanel{
                     }
                 };
             }
-            catch(IOException socketException){
-                Utils.log("Exception on creating new socket: " + socketException + "\n");
+            catch(IOException exception){
+                Utils.log("Exception: " + exception + "\n");
             }
             RoverThread controllerConnectThread = new RoverThread(controller, "Controller Client");
             controllerConnectThread.start();
@@ -705,6 +719,41 @@ public class ControllerPanel extends javax.swing.JPanel{
         });
         JOptionPane.showConfirmDialog(null, panel1, "Browse Report", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        if(JOptionPane.showConfirmDialog (null, "Are you sure we want to ABORT?", "WARNING", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
+            ControllerRunnable controller = null;
+            ArrayList<CommandObject> sendList = new ArrayList<>();
+            sendList.add(new CommandObject(1, "ABORT"));
+            Gson gson = new Gson();
+            final String jsonString = gson.toJson(sendList);
+            try{
+                controller = new ControllerRunnable(AgentPort, null){
+                    @Override
+                    public void run(){
+                        try{
+                            try(ObjectOutputStream oos = new ObjectOutputStream(getRunnableSocket().getSocket().getOutputStream())){
+                                RoverThread.sleep(2000);                                
+                                oos.writeObject(jsonString);
+                                jTextArea1.append("Client: ABORT Command sent to Agent\n");
+                                RoverThread.sleep(1000);
+                                oos.close();
+                            } 
+                            closeAllRunnable();
+                        }
+                        catch(InterruptedException | IOException exception){
+                            Utils.log("Exception: " + exception + "\n");
+                        }
+                    }
+                };
+            }
+            catch(IOException exception){
+                Utils.log("Exception: " + exception + "\n");
+            }
+            RoverThread controllerConnectThread = new RoverThread(controller, "Controller Client");
+            controllerConnectThread.start();
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox combo;
@@ -713,6 +762,7 @@ public class ControllerPanel extends javax.swing.JPanel{
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;

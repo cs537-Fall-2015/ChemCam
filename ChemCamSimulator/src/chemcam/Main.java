@@ -11,8 +11,8 @@ public class Main {
                 try{
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 }
-                catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException exception) {
-                    Utils.log(exception.toString());
+                catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException exception){
+                    Utils.log("Exception: " + exception + "\n");
                 }
                 JFrame frame = MainFrame.getInstance();
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

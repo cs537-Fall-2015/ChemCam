@@ -39,13 +39,19 @@ public class AgentPanel extends javax.swing.JPanel{
                             getRunnableServerSocket().openSocket();
                             try(ObjectInputStream ois = new ObjectInputStream(getRunnableServerSocket().getSocket().getInputStream())){
                                 String jsonString = (String)ois.readObject();
-                                ArrayList<CommandObject> command = gson.fromJson(jsonString, new TypeToken<ArrayList<CommandObject>>(){}.getType());
-                                if(!command.isEmpty()){                                    
-                                    jTextArea1.append("Server: Commands Received from Controller.\n");
-                                    //jTextArea1.append(gson.toJson(command) + "\n");
-                                    int queueNumber = queue.size();
-                                    jTextArea1.append("Server: Assigned Queue Item #" + queueNumber + " to Worker Thread.\n");
-                                    queue.put(new QueueItem(jsonString, queueNumber));                                    
+                                ArrayList<CommandObject> command = gson.fromJson(jsonString, new TypeToken<ArrayList<CommandObject>>(){}.getType());                                
+                                if(!command.isEmpty()){
+                                    if(command.get(0).isAbort()){
+                                        jTextArea1.append("Server: ABORT Command Received from Controller.\n");
+                                        queue.clear();
+                                        jTextArea1.append("Server: Queued Commands Cleared.\n");                                    
+                                    }
+                                    else{
+                                        jTextArea1.append("Server: Commands Received from Controller.\n");
+                                        int queueNumber = queue.size();
+                                        queue.put(new QueueItem(jsonString, queueNumber));
+                                        jTextArea1.append("Server: Assigned Queue Item #" + queueNumber + " to Worker Thread.\n");
+                                    }
                                 }
                                 ois.close();
                                 Thread.sleep(3000);
@@ -178,7 +184,7 @@ public class AgentPanel extends javax.swing.JPanel{
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").setPrettyPrinting().create();
         String resultListJSON = "";
         try{
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File("src/chemcam/data/AgentData/gatherData.txt").getAbsoluteFile()))) {
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File("src/chemcam/data/AgentData/gatherData.txt").getAbsoluteFile()))){
                 String line;                
                 while((line = bufferedReader.readLine()) != null){
                     resultListJSON += line;
@@ -190,7 +196,7 @@ public class AgentPanel extends javax.swing.JPanel{
         }
         String reportListJSON = "";
         try{
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File("src/chemcam/data/AgentData/reportData.txt").getAbsoluteFile()))) {
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File("src/chemcam/data/AgentData/reportData.txt").getAbsoluteFile()))){
                 String line;                
                 while((line = bufferedReader.readLine()) != null){
                     reportListJSON += line;
