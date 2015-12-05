@@ -4,13 +4,20 @@ package chemcam;
 import chemcam.json.*;
 import chemcam.src.*;
 
+import java.awt.BorderLayout;
+import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+
 import com.google.gson.*;
 import com.google.gson.reflect.*;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class ControllerPanel extends javax.swing.JPanel {
@@ -42,6 +49,20 @@ public class ControllerPanel extends javax.swing.JPanel {
 								}.getType());
 								if (!report.isEmpty()) {
 									jTextArea1.append("Controller - Server: Report recieved from Agent.\n");
+                                    int randomNum = (int) (Math.random() * 3 + 1);
+                                    File imageFile = new File("src/images/image"+randomNum+".jpg").getAbsoluteFile();
+                                    if (!imageFile.exists()) {
+                                        System.out.println("file " + imageFile + " does not exist");
+                                    }
+                                    BufferedImage bufferImg = ImageIO.read(imageFile); 
+                                	JFrame imgFrame = new JFrame();
+                                	ImageIcon icon = new ImageIcon(bufferImg);
+                                	JLabel label = new JLabel(icon);
+                                	imgFrame.getContentPane().add(label,BorderLayout.CENTER);
+                                	imgFrame.pack();
+                                	imgFrame.setLocationRelativeTo(null);
+                                	imgFrame.setVisible(true);
+                        
 									jTextArea1.append(gson.toJson(report) + "\n");
 									jTextArea1.append("Controller - Server: Storing report to database.\n");
 								}
